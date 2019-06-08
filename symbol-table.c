@@ -19,9 +19,7 @@ void expandScopeControl() {
 	unsigned int i;
 	SymbolTable** tablesTmp = scopeControl->tables;
 	scopeControl->size += 10;
-	if((scopeControl->tables = malloc(sizeof(SymbolTable*)* scopeControl->size)) == NULL) {
-		exit(1);
-	}
+	scopeControl->tables = malloc(sizeof(SymbolTable*) * scopeControl->size);
 	if(scopeControl->scope > 0){
 		for(i = 0; i < scopeControl->scope; i++) {
 			scopeControl->tables[i] = tablesTmp[i];
@@ -38,13 +36,9 @@ void inScope() {
 	if(scopeControl->scope == scopeControl->size)
 		expandScopeControl();
 
-	if((table = malloc(sizeof(SymbolTable))) == NULL) {
-		exit(1);
-	}
+	table = malloc(sizeof(SymbolTable));
 	table->size = 500;
-	if((table->list = malloc(sizeof(Item*)* table->size)) == NULL) {
-		exit(1);
-	}
+	table->list = malloc(sizeof(Item*) * table->size);
 	for(i = 0; i < table->size; i++) {
 		table->list[i] = NULL;
 	}
@@ -69,9 +63,7 @@ void outScope() {
 }
 
 void initSymbolTable() {
-	if((scopeControl = malloc(sizeof(ScopeControl))) == NULL) {
-		exit(1);
-	}
+	scopeControl = malloc(sizeof(ScopeControl));
 	scopeControl->size = 0;
 	scopeControl->scope = 0;
 	inScope();
@@ -98,22 +90,14 @@ void add(char* key, char* value) {
 		last = next;
 		next = next->next;
 	}
-
 	if(next != NULL && next->key != NULL && strcmp(key, next->key) == 0) {
 		free(next->value);
 		next->value = strdup(value);
 	} else {
-		if((newpair = malloc(sizeof(Item))) == NULL) {
-			newpair = NULL;
-		}else{
-			if((newpair->key = strdup(key)) == NULL) {
-				newpair = NULL;
-			}
-			if((newpair->value = strdup(value)) == NULL) {
-				newpair = NULL;
-			}
-			newpair->next = NULL;
-		}
+		newpair = malloc(sizeof(Item));
+		newpair->key = strdup(key);
+		newpair->value = strdup(value);
+		newpair->next = NULL;
 
 		/* We're at the start of the linked list in this hash. */
 		if(next == scopeControl->tables[scopeControl->scope]->list[ hash ]) {
