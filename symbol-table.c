@@ -1,18 +1,6 @@
 #include <limits.h>
 #include <string.h>
-
-char* strdup(const char* src) {
-	char* dst = malloc(strlen(src) + 1);
-	if (dst == NULL) return NULL;
-	strcpy(dst, src);
-	return dst;
-}
-
-typedef struct Item {
-	char* key;
-	char* value;
-	struct Item* next;
-} Item;
+#include "comum.c"
 
 typedef struct SymbolTable {
 	unsigned int size;
@@ -65,8 +53,14 @@ void inScope() {
 
 void outScope() {
 	unsigned int i;
+	Item* item;
 	SymbolTable* table = scopeControl->tables[scopeControl->scope];
 	for(i = 0; i < table->size; i++) {
+		item = table->list[i]->next;
+		while(item != NULL) {
+			free(item);
+			item = item->next;
+		}
 		free(table->list[i]);
 	}
 	free(table->list);

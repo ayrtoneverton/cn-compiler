@@ -1,7 +1,12 @@
 %{
+	#include "comum.c"
 	#include "lex.yy.c"
 	#include "semantic.c"
 %}
+
+%union {
+	Item* item;
+};
 
 %token IDENTIFIER STRING_LITERAL SIZEOF
 %token NEW TRUE FALSE INTEGER_LITERAL CHAR_LITERAL DECIMAL_LITERAL

@@ -116,7 +116,7 @@ L?\"(\\.|[^\\"])*\"				{ count(); return STRING_LITERAL; }
 "?"								{ count(); return '?'; }
 
 [ \t\v\n\f]						{ count(); }
-.								{ count(); return yylval; }
+.								{ count(); return yytext[0]; }
 
 %%
 
@@ -139,6 +139,6 @@ void count() {
 }
 
 int yyerror(char* s) {
-	fprintf(stderr, "\n%s, linha: %d, coluna: %d\n", s, row, column);
+	fprintf(stderr, "\n%s, row: %d, column: %d\n", s, row, column);
 	return 0;
 }
