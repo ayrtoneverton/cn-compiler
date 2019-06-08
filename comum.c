@@ -1,5 +1,5 @@
 #ifndef comum_c
-#define comum_c 0
+#define comum_c
 
 #include <stdlib.h>
 #include <string.h>
