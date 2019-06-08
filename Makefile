@@ -1,6 +1,6 @@
 # Makefile
 
-CPNAME = cn-compiler.exe
+CPNAME = cn.exe
 
 main: all clean
 
