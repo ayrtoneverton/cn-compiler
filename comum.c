@@ -19,21 +19,6 @@ char* strdup(const char* src) {
 	return dist;
 }
 
-char* concat2(const int size, char** list) {
-	int len = 1;
-	char* dist;
-	int i;
-	for (i = 0; i < size; ++i) {
-		len += strlen(list[i]);
-	}
-	dist = malloc(len);
-	strcpy(dist, list[0]);
-	for (i = 1; i < size; ++i) {
-		strcat(dist, list[i]);
-	}
-	return dist;
-}
-
 char* concat(int count, ...){
 	va_list ap;
 	int i;
@@ -62,11 +47,11 @@ typedef struct Exp {
 	struct Exp* next;
 } Exp;
 
-Exp* newExp(const char* name, const int type, const char* value){
+Exp* newExp(char* name, const int type, char* value){
 	Exp* exp = malloc(sizeof(Exp));
-	exp->name = strdup(name);
+	exp->name = name;
 	exp->type = type;
-	exp->value = strdup(value);
+	exp->value = value;
 	exp->next = NULL;
 	return exp;
 }
@@ -78,6 +63,13 @@ void freeExp(Exp* exp){
 		freeExp(exp->next);
 		free(exp);
 	}
+}
+
+void freeAllExp(int count, ...){
+	va_list ap;
+	va_start(ap, count);
+		freeExp(va_arg(ap, Exp*));
+	va_end(ap);
 }
 
 #endif

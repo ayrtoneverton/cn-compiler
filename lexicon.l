@@ -140,7 +140,7 @@ int tokenUp(const int token) {
 	if(token == IDENTIFIER)
 		yylval.exp = get(yytext);
 	if(token > 0 && yylval.exp == NULL)
-		yylval.exp = newExp(NULL, token, yytext);
+		yylval.exp = newExp(NULL, token, strdup(yytext));
 	/*if (strlen(yytext) < 2 || yytext[0] != '/' || !(yytext[1] == '*' || yytext[1] == '/'))
 		ECHO;*/
 	return token;

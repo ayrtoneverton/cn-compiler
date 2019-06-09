@@ -19,6 +19,17 @@
 %token <exp> STRUCT UNION ENUM ELLIPSIS
 %token <exp> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%type <exp> unary_op binary_op assignment_op primary_exp unary_exp binary_exp complex_exp assignment_exp
+%type <exp> exp exp_list declaration declaration_specifiers init_declarator_list init_declarator
+%type <exp> storage_class_specifier type_specifier struct_or_union_specifier struct_or_union
+%type <exp> struct_declaration_list struct_declaration specifier_qualifier_list struct_declarator_list
+%type <exp> struct_declarator enum_specifier enumerator_list enumerator type_qualifier declarator
+%type <exp> direct_declarator pointer type_qualifier_list parameter_type_list parameter_list
+%type <exp> parameter_declaration identifier_list type_name abstract_declarator direct_abstract_declarator
+%type <exp> initializer initializer_list stm labeled_stm case_stm default_stm case_stm_list switch_stm
+%type <exp> compound_stm declaration_list stm_list for_exp selection_stm iteration_stm jump_stm
+%type <exp> translation_unit external_declaration function_def
+
 %start translation_unit
 
 %left '<' '>' LE_OP GE_OP EQ_OP NE_OP '&' '^' '|' AND_OP OR_OP
@@ -96,7 +107,7 @@ unary_exp
 
 binary_exp
 	: unary_exp
-	| binary_exp binary_op unary_exp									{ binary_exp($<exp>1, $<exp>2, $<exp>3) }
+	| binary_exp binary_op unary_exp									{ binary_exp(&$$, $1, $2, $3); }
 	;
 
 complex_exp
