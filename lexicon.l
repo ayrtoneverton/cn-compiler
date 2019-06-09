@@ -1,7 +1,9 @@
 %{
 	#include "syntactic.tab.h"
+	#include "comum.c"
+	#include "symbol-table.c"
 
-	void count();
+	int tokenUp(const int);
 %}
 
 %option noinput
@@ -18,112 +20,112 @@ IS			((u|U)?(l|ll|L|LL)|(l|ll|L|LL)?(u|U))
 
 %%
 
-"/*"([^*]|\*+[^/])*"*/"|"//".*	{ count(); }
+"/*"([^*]|\*+[^/])*"*/"|"//".*	{ tokenUp(0); }
 
-"auto"							{ count(); return AUTO; }
-"break"							{ count(); return BREAK; }
-"case"							{ count(); return CASE; }
-"char"							{ count(); return CHAR; }
-"const"							{ count(); return CONST; }
-"continue"						{ count(); return CONTINUE; }
-"default"						{ count(); return DEFAULT; }
-"do"							{ count(); return DO; }
-"double"						{ count(); return DOUBLE; }
-"else"							{ count(); return ELSE; }
-"enum"							{ count(); return ENUM; }
-"extern"						{ count(); return EXTERN; }
-"false"							{ count(); return FALSE; }
-"float"							{ count(); return FLOAT; }
-"for"							{ count(); return FOR; }
-"goto"							{ count(); return GOTO; }
-"if"							{ count(); return IF; }
-"int"							{ count(); return INT; }
-"long"							{ count(); return LONG; }
-"new"							{ count(); return NEW; }
-"return"						{ count(); return RETURN; }
-"short"							{ count(); return SHORT; }
-"signed"						{ count(); return SIGNED; }
-"sizeof"						{ count(); return SIZEOF; }
-"static"						{ count(); return STATIC; }
-"struct"						{ count(); return STRUCT; }
-"switch"						{ count(); return SWITCH; }
-"true"							{ count(); return TRUE; }
-"typedef"						{ count(); return TYPEDEF; }
-"union"							{ count(); return UNION; }
-"unsigned"						{ count(); return UNSIGNED; }
-"void"							{ count(); return VOID; }
-"volatile"						{ count(); return VOLATILE; }
-"while"							{ count(); return WHILE; }
+"auto"							{ return tokenUp(AUTO); }
+"break"							{ return tokenUp(BREAK); }
+"case"							{ return tokenUp(CASE); }
+"char"							{ return tokenUp(CHAR); }
+"const"							{ return tokenUp(CONST); }
+"continue"						{ return tokenUp(CONTINUE); }
+"default"						{ return tokenUp(DEFAULT); }
+"do"							{ return tokenUp(DO); }
+"double"						{ return tokenUp(DOUBLE); }
+"else"							{ return tokenUp(ELSE); }
+"enum"							{ return tokenUp(ENUM); }
+"extern"						{ return tokenUp(EXTERN); }
+"false"							{ return tokenUp(FALSE); }
+"float"							{ return tokenUp(FLOAT); }
+"for"							{ return tokenUp(FOR); }
+"goto"							{ return tokenUp(GOTO); }
+"if"							{ return tokenUp(IF); }
+"int"							{ return tokenUp(INT); }
+"long"							{ return tokenUp(LONG); }
+"new"							{ return tokenUp(NEW); }
+"return"						{ return tokenUp(RETURN); }
+"short"							{ return tokenUp(SHORT); }
+"signed"						{ return tokenUp(SIGNED); }
+"sizeof"						{ return tokenUp(SIZEOF); }
+"static"						{ return tokenUp(STATIC); }
+"struct"						{ return tokenUp(STRUCT); }
+"switch"						{ return tokenUp(SWITCH); }
+"true"							{ return tokenUp(TRUE); }
+"typedef"						{ return tokenUp(TYPEDEF); }
+"union"							{ return tokenUp(UNION); }
+"unsigned"						{ return tokenUp(UNSIGNED); }
+"void"							{ return tokenUp(VOID); }
+"volatile"						{ return tokenUp(VOLATILE); }
+"while"							{ return tokenUp(WHILE); }
 
-{L}({L}|{D})*					{ count(); return IDENTIFIER; }
+{L}({L}|{D})*					{ return tokenUp(IDENTIFIER); }
 
-0[xX]{H}+{IS}?					{ count(); return INTEGER_LITERAL; }
-0[0-7]+{IS}?					{ count(); return INTEGER_LITERAL; }
-{D}+{IS}?						{ count(); return INTEGER_LITERAL; }
+0[xX]{H}+{IS}?					{ return tokenUp(INTEGER_LITERAL); }
+0[0-7]+{IS}?					{ return tokenUp(INTEGER_LITERAL); }
+{D}+{IS}?						{ return tokenUp(INTEGER_LITERAL); }
 
-L?'(\\.|[^\\'])+'				{ count(); return CHAR_LITERAL; }
+L?'(\\.|[^\\'])+'				{ return tokenUp(CHAR_LITERAL); }
 
-{D}+{E}{FS}?					{ count(); return DECIMAL_LITERAL; }
-({D}+".")?{D}+({E})?{FS}?		{ count(); return DECIMAL_LITERAL; }
+{D}+{E}{FS}?					{ return tokenUp(DECIMAL_LITERAL); }
+({D}+".")?{D}+({E})?{FS}?		{ return tokenUp(DECIMAL_LITERAL); }
 
-L?\"(\\.|[^\\"])*\"				{ count(); return STRING_LITERAL; }
+L?\"(\\.|[^\\"])*\"				{ return tokenUp(STRING_LITERAL); }
 
-"..."							{ count(); return ELLIPSIS; }
-">>="							{ count(); return RIGHT_ASSIGN; }
-"<<="							{ count(); return LEFT_ASSIGN; }
-"+="							{ count(); return ADD_ASSIGN; }
-"-="							{ count(); return SUB_ASSIGN; }
-"*="							{ count(); return MUL_ASSIGN; }
-"/="							{ count(); return DIV_ASSIGN; }
-"%="							{ count(); return MOD_ASSIGN; }
-"&="							{ count(); return AND_ASSIGN; }
-"^="							{ count(); return XOR_ASSIGN; }
-"|="							{ count(); return OR_ASSIGN; }
-">>"							{ count(); return RIGHT_OP; }
-"<<"							{ count(); return LEFT_OP; }
-"++"							{ count(); return INC_OP; }
-"--"							{ count(); return DEC_OP; }
-"->"							{ count(); return PTR_OP; }
-"&&"							{ count(); return AND_OP; }
-"||"							{ count(); return OR_OP; }
-"<="							{ count(); return LE_OP; }
-">="							{ count(); return GE_OP; }
-"=="							{ count(); return EQ_OP; }
-"!="							{ count(); return NE_OP; }
-";"								{ count(); return ';'; }
-("{"|"<%")						{ count(); return '{'; }
-("}"|"%>")						{ count(); return '}'; }
-","								{ count(); return ','; }
-":"								{ count(); return ':'; }
-"="								{ count(); return '='; }
-"("								{ count(); return '('; }
-")"								{ count(); return ')'; }
-("["|"<:")						{ count(); return '['; }
-("]"|":>")						{ count(); return ']'; }
-"."								{ count(); return '.'; }
-"&"								{ count(); return '&'; }
-"!"								{ count(); return '!'; }
-"~"								{ count(); return '~'; }
-"-"								{ count(); return '-'; }
-"+"								{ count(); return '+'; }
-"*"								{ count(); return '*'; }
-"/"								{ count(); return '/'; }
-"%"								{ count(); return '%'; }
-"<"								{ count(); return '<'; }
-">"								{ count(); return '>'; }
-"^"								{ count(); return '^'; }
-"|"								{ count(); return '|'; }
-"?"								{ count(); return '?'; }
+"..."							{ return tokenUp(ELLIPSIS); }
+">>="							{ return tokenUp(RIGHT_ASSIGN); }
+"<<="							{ return tokenUp(LEFT_ASSIGN); }
+"+="							{ return tokenUp(ADD_ASSIGN); }
+"-="							{ return tokenUp(SUB_ASSIGN); }
+"*="							{ return tokenUp(MUL_ASSIGN); }
+"/="							{ return tokenUp(DIV_ASSIGN); }
+"%="							{ return tokenUp(MOD_ASSIGN); }
+"&="							{ return tokenUp(AND_ASSIGN); }
+"^="							{ return tokenUp(XOR_ASSIGN); }
+"|="							{ return tokenUp(OR_ASSIGN); }
+">>"							{ return tokenUp(RIGHT_OP); }
+"<<"							{ return tokenUp(LEFT_OP); }
+"++"							{ return tokenUp(INC_OP); }
+"--"							{ return tokenUp(DEC_OP); }
+"->"							{ return tokenUp(PTR_OP); }
+"&&"							{ return tokenUp(AND_OP); }
+"||"							{ return tokenUp(OR_OP); }
+"<="							{ return tokenUp(LE_OP); }
+">="							{ return tokenUp(GE_OP); }
+"=="							{ return tokenUp(EQ_OP); }
+"!="							{ return tokenUp(NE_OP); }
+";"								{ return tokenUp(';'); }
+("{"|"<%")						{ return tokenUp('{'); }
+("}"|"%>")						{ return tokenUp('}'); }
+","								{ return tokenUp(','); }
+":"								{ return tokenUp(':'); }
+"="								{ return tokenUp('='); }
+"("								{ return tokenUp('('); }
+")"								{ return tokenUp(')'); }
+("["|"<:")						{ return tokenUp('['); }
+("]"|":>")						{ return tokenUp(']'); }
+"."								{ return tokenUp('.'); }
+"&"								{ return tokenUp('&'); }
+"!"								{ return tokenUp('!'); }
+"~"								{ return tokenUp('~'); }
+"-"								{ return tokenUp('-'); }
+"+"								{ return tokenUp('+'); }
+"*"								{ return tokenUp('*'); }
+"/"								{ return tokenUp('/'); }
+"%"								{ return tokenUp('%'); }
+"<"								{ return tokenUp('<'); }
+">"								{ return tokenUp('>'); }
+"^"								{ return tokenUp('^'); }
+"|"								{ return tokenUp('|'); }
+"?"								{ return tokenUp('?'); }
 
-[ \t\v\n\f]						{ count(); }
-.								{ count(); return yytext[0]; }
+[ \t\v\n\f]						{ tokenUp(0); }
+.								{ return tokenUp(*yytext); }
 
 %%
 
 int column = 0;
 int row = 1;
 
-void count() {
+int tokenUp(const int token) {
 	int i;
 	for (i = 0; yytext[i] != '\0'; i++) {
 		if (yytext[i] == '\n'){
@@ -134,8 +136,14 @@ void count() {
 		else
 			column++;
 	}
-	if (strlen(yytext) < 2 || yytext[0] != '/' || !(yytext[1] == '*' || yytext[1] == '/'))
-		ECHO;
+	yylval.exp = NULL;
+	if(token == IDENTIFIER)
+		yylval.exp = get(yytext);
+	if(token > 0 && yylval.exp == NULL)
+		yylval.exp = newExp(NULL, token, yytext);
+	/*if (strlen(yytext) < 2 || yytext[0] != '/' || !(yytext[1] == '*' || yytext[1] == '/'))
+		ECHO;*/
+	return token;
 }
 
 int yyerror(char* s) {

@@ -5,19 +5,19 @@
 %}
 
 %union {
-	Item* item;
+	Exp* exp;
 };
 
-%token IDENTIFIER STRING_LITERAL SIZEOF
-%token NEW TRUE FALSE INTEGER_LITERAL CHAR_LITERAL DECIMAL_LITERAL
-%token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
-%token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
-%token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token XOR_ASSIGN OR_ASSIGN TYPE_NAME
-%token TYPEDEF EXTERN STATIC AUTO
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
-%token STRUCT UNION ENUM ELLIPSIS
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token <exp> IDENTIFIER STRING_LITERAL SIZEOF
+%token <exp> NEW TRUE FALSE INTEGER_LITERAL CHAR_LITERAL DECIMAL_LITERAL
+%token <exp> PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
+%token <exp> AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token <exp> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
+%token <exp> XOR_ASSIGN OR_ASSIGN TYPE_NAME
+%token <exp> TYPEDEF EXTERN STATIC AUTO
+%token <exp> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token <exp> STRUCT UNION ENUM ELLIPSIS
+%token <exp> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
 %start translation_unit
 
@@ -73,7 +73,7 @@ assignment_op
 	;
 
 primary_exp
-	: IDENTIFIER											{ s_identifier(); }
+	: IDENTIFIER
 	| '(' exp ')'
 	| primary_exp '[' exp ']'
 	| primary_exp '(' ')'
@@ -96,7 +96,7 @@ unary_exp
 
 binary_exp
 	: unary_exp
-	| binary_exp binary_op unary_exp
+	| binary_exp binary_op unary_exp									{ binary_exp($<exp>1, $<exp>2, $<exp>3) }
 	;
 
 complex_exp
@@ -121,6 +121,7 @@ exp
 exp_list
 	: exp
 	| exp_list ',' exp
+	;
 
 declaration
 	: declaration_specifiers init_declarator_list ';'
@@ -412,5 +413,6 @@ int main(int argc, char* argv[]) {
 		printf("Could not use file \"%s\"\n", argv[1]);
 		exit(1);
 	}
+	initSymbolTable();
 	return yyparse();
 }

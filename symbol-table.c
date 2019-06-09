@@ -1,10 +1,13 @@
+#ifndef symbol_table_c
+#define symbol_table_c
+
 #include <limits.h>
 #include <string.h>
 #include "comum.c"
 
 typedef struct SymbolTable {
 	unsigned int size;
-	struct Item** list;
+	struct Exp** list;
 } SymbolTable;
 
 typedef struct {
@@ -38,7 +41,7 @@ void inScope() {
 
 	table = malloc(sizeof(SymbolTable));
 	table->size = 500;
-	table->list = malloc(sizeof(Item*) * table->size);
+	table->list = malloc(sizeof(Exp*) * table->size);
 	for(i = 0; i < table->size; i++) {
 		table->list[i] = NULL;
 	}
@@ -47,13 +50,13 @@ void inScope() {
 
 void outScope() {
 	unsigned int i;
-	Item* item;
+	Exp* exp;
 	SymbolTable* table = scopeControl->tables[scopeControl->scope];
 	for(i = 0; i < table->size; i++) {
-		item = table->list[i]->next;
-		while(item != NULL) {
-			free(item);
-			item = item->next;
+		exp = table->list[i]->next;
+		while(exp != NULL) {
+			free(exp);
+			exp = exp->next;
 		}
 		free(table->list[i]);
 	}
@@ -69,7 +72,7 @@ void initSymbolTable() {
 	inScope();
 }
 
-int getHash(char* key) {
+int getHash(const char* key) {
 	unsigned long int hashval = 0;
 	unsigned int i = 0;
 	while(hashval < ULONG_MAX && i < strlen(key)) {
@@ -80,50 +83,29 @@ int getHash(char* key) {
 	return hashval % scopeControl->tables[scopeControl->scope]->size;
 }
 
-void add(char* key, char* value) {
-	Item* newpair = NULL;
-	Item* last = NULL;
-	int hash = getHash(key);
-	Item* next = scopeControl->tables[scopeControl->scope]->list[ hash ];
+int add(Exp* exp) {
+	int hash = getHash(exp->name);
+	Exp* last = scopeControl->tables[scopeControl->scope]->list[ hash ];
 
-	while(next != NULL && next->key != NULL && strcmp(key, next->key) > 0) {
-		last = next;
-		next = next->next;
+	while (last != NULL && last->next != NULL && strcmp(exp->name, last->name)) {
+		last = last->next;
 	}
-	if(next != NULL && next->key != NULL && strcmp(key, next->key) == 0) {
-		free(next->value);
-		next->value = strdup(value);
+	if (last == NULL) {
+		scopeControl->tables[scopeControl->scope]->list[ hash ] = exp;
+	} else if (!strcmp(exp->name, last->name)) {
+		return 1;
 	} else {
-		newpair = malloc(sizeof(Item));
-		newpair->key = strdup(key);
-		newpair->value = strdup(value);
-		newpair->next = NULL;
-
-		/* We're at the start of the linked list in this hash. */
-		if(next == scopeControl->tables[scopeControl->scope]->list[ hash ]) {
-			newpair->next = next;
-			scopeControl->tables[scopeControl->scope]->list[ hash ] = newpair;
-
-		/* We're at the end of the linked list in this hash. */
-		} else if (next == NULL) {
-			last->next = newpair;
-
-		/* We're in the middle of the list. */
-		} else {
-			newpair->next = next;
-			last->next = newpair;
-		}
+		last->next = exp;
 	}
+	return 0;
 }
 
-char* get(char* key) {
-	Item* pair = scopeControl->tables[scopeControl->scope]->list[ getHash(key) ];
-	while(pair != NULL && pair->key != NULL && strcmp(key, pair->key) > 0) {
-		pair = pair->next;
+Exp* get(const char* name) {
+	Exp* exp = scopeControl->tables[scopeControl->scope]->list[ getHash(name) ];
+	while (exp != NULL && strcmp(name, exp->name)) {
+		exp = exp->next;
 	}
-	if(pair == NULL || pair->key == NULL || strcmp(key, pair->key) != 0) {
-		return NULL;
-	} else {
-		return pair->value;
-	}
+	return exp;
 }
+
+#endif
