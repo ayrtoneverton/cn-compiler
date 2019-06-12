@@ -3,6 +3,7 @@
 
 #include <limits.h>
 #include <string.h>
+#include "comum.c"
 
 typedef struct Item {
 	struct Exp* exp;
@@ -78,13 +79,6 @@ void outScope() {
 	scopeControl->scope--;
 }
 
-void initSymbolTable() {
-	scopeControl = malloc(sizeof(ScopeControl));
-	scopeControl->size = 0;
-	scopeControl->scope = 0;
-	inScope();
-}
-
 int getHash(const char* key) {
 	unsigned long int hashval = 0;
 	unsigned int i = 0;
@@ -121,6 +115,18 @@ Exp* get(const char* name) {
 	if (item == NULL)
 		return NULL;
 	return item->exp;
+}
+
+void initSymbolTable() {
+	scopeControl = malloc(sizeof(ScopeControl));
+	scopeControl->size = 0;
+	scopeControl->scope = 0;
+	inScope();
+	add(newExp(strdup("short"), EXP_TYPE, NULL));
+	add(newExp(strdup("int"), EXP_TYPE, NULL));
+	add(newExp(strdup("long"), EXP_TYPE, NULL));
+	add(newExp(strdup("float"), EXP_TYPE, NULL));
+	add(newExp(strdup("double"), EXP_TYPE, NULL));
 }
 
 #endif

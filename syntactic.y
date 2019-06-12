@@ -15,7 +15,7 @@
 %token <exp> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <exp> XOR_ASSIGN OR_ASSIGN TYPE_NAME
 %token <exp> TYPEDEF EXTERN STATIC AUTO
-%token <exp> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token <exp> CHAR SHORT INT LONG UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token <exp> STRUCT UNION ENUM ELLIPSIS
 %token <exp> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
@@ -107,7 +107,7 @@ unary_exp
 	;
 
 binary_exp
-	: unary_exp															{ unary_exp(&$$, $1) }
+	: unary_exp
 	| binary_exp binary_op unary_exp									{ binary_exp2(&$$, $1, $2, $3); }
 	;
 
@@ -173,7 +173,6 @@ type_specifier
 	| LONG
 	| FLOAT
 	| DOUBLE
-	| SIGNED
 	| UNSIGNED
 	| struct_or_union_specifier
 	| enum_specifier

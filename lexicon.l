@@ -43,7 +43,6 @@ IS			((u|U)?(l|ll|L|LL)|(l|ll|L|LL)?(u|U))
 "new"							{ return tokenUp(NEW); }
 "return"						{ return tokenUp(RETURN); }
 "short"							{ return tokenUp(SHORT); }
-"signed"						{ return tokenUp(SIGNED); }
 "sizeof"						{ return tokenUp(SIZEOF); }
 "static"						{ return tokenUp(STATIC); }
 "struct"						{ return tokenUp(STRUCT); }
@@ -124,6 +123,24 @@ L?\"(\\.|[^\\"])*\"				{ return tokenUp(STRING_LITERAL); }
 int column = 0;
 int row = 1;
 
+Exp* setType(const int token) {
+	Exp* exp = NULL;
+	switch (token) {
+		case CHAR_LITERAL:
+			exp = get("char");
+			break;
+		case INTEGER_LITERAL:
+			exp = get("int");
+			break;
+		case DECIMAL_LITERAL:
+			exp = get("float");
+			break;
+		case STRING_LITERAL:
+			exp = get("string");
+	}
+	return exp;
+}
+
 int tokenUp(const int token) {
 	int i;
 	for (i = 0; yytext[i] != '\0'; i++) {
@@ -139,7 +156,7 @@ int tokenUp(const int token) {
 	if(token == IDENTIFIER)
 		yylval.exp = get(yytext);
 	if(token > 0 && yylval.exp == NULL)
-		yylval.exp = newExp(strdup(yytext), token);
+		yylval.exp = newExp(strdup(yytext), token, setType(token));
 	return token;
 }
 

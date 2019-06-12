@@ -7,7 +7,8 @@
 
 enum {
 	EXP_FUNCTION = -20,
-	EXP_STRUCT
+	EXP_STRUCT,
+	EXP_TYPE
 };
 
 char* strdup(const char* src) {
@@ -47,11 +48,11 @@ typedef struct Exp {
 	struct Exp* next;
 } Exp;
 
-Exp* newExp(char* value, const int token) {
+Exp* newExp(char* value, const int token, Exp* type) {
 	Exp* exp = malloc(sizeof(Exp));
 	exp->value = value;
 	exp->token = token;
-	exp->type = NULL;
+	exp->type = type;
 	exp->next = NULL;
 	return exp;
 }
