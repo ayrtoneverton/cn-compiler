@@ -19,6 +19,7 @@
 %token <exp> STRUCT UNION ENUM ELLIPSIS
 %token <exp> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%type <exp> ';' '{' '}' ',' ':' '=' '(' ')' '[' ']' '.' '&' '!' '~' '-' '+' '*' '/' '%' '<' '>' '^' '|' '?'
 %type <exp> unary_op binary_op assignment_op primary_exp unary_exp binary_exp complex_exp assignment_exp
 %type <exp> exp exp_list declaration declaration_specifiers init_declarator_list init_declarator
 %type <exp> storage_class_specifier type_specifier struct_or_union_specifier struct_or_union
@@ -85,7 +86,7 @@ assignment_op
 
 primary_exp
 	: IDENTIFIER
-	| '(' exp ')'
+	| '(' exp ')'														{ primary_exp2(&$$, $1, $2, $3); }
 	| primary_exp '[' exp ']'
 	| primary_exp '(' ')'
 	| primary_exp '(' exp_list ')'
@@ -107,7 +108,7 @@ unary_exp
 
 binary_exp
 	: unary_exp
-	| binary_exp binary_op unary_exp									{ binary_exp(&$$, $1, $2, $3); }
+	| binary_exp binary_op unary_exp									{ binary_exp2(&$$, $1, $2, $3); }
 	;
 
 complex_exp

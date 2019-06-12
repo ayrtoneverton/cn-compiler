@@ -3,11 +3,15 @@
 
 #include <limits.h>
 #include <string.h>
-#include "comum.c"
+
+typedef struct Item {
+	struct Exp* exp;
+	struct Item* next;
+} Item;
 
 typedef struct SymbolTable {
 	unsigned int size;
-	struct Exp** list;
+	struct Item** list;
 } SymbolTable;
 
 typedef struct {
@@ -17,6 +21,21 @@ typedef struct {
 } ScopeControl;
 
 ScopeControl* scopeControl = NULL;
+
+Item* newItem(Exp* exp) {
+	Item* item = malloc(sizeof(Item));
+	item->exp = exp;
+	item->next = NULL;
+	return item;
+}
+
+void freeItem(Item* item) {
+	if (item != NULL) {
+		freeExp(item->exp);
+		freeItem(item->next);
+		free(item);
+	}
+}
 
 void expandScopeControl() {
 	unsigned int i;
@@ -40,8 +59,8 @@ void inScope() {
 		expandScopeControl();
 
 	table = malloc(sizeof(SymbolTable));
-	table->size = 500;
-	table->list = malloc(sizeof(Exp*) * table->size);
+	table->size = 100;
+	table->list = malloc(sizeof(Item*) * table->size);
 	for(i = 0; i < table->size; i++) {
 		table->list[i] = NULL;
 	}
@@ -50,15 +69,9 @@ void inScope() {
 
 void outScope() {
 	unsigned int i;
-	Exp* exp;
 	SymbolTable* table = scopeControl->tables[scopeControl->scope];
 	for(i = 0; i < table->size; i++) {
-		exp = table->list[i]->next;
-		while(exp != NULL) {
-			free(exp);
-			exp = exp->next;
-		}
-		free(table->list[i]);
+		freeItem(table->list[i]);
 	}
 	free(table->list);
 	free(table);
@@ -84,28 +97,30 @@ int getHash(const char* key) {
 }
 
 int add(Exp* exp) {
-	int hash = getHash(exp->name);
-	Exp* last = scopeControl->tables[scopeControl->scope]->list[ hash ];
+	int hash = getHash(exp->value);
+	Item* last = scopeControl->tables[scopeControl->scope]->list[ hash ];
 
-	while (last != NULL && last->next != NULL && strcmp(exp->name, last->name)) {
+	while (last != NULL && last->next != NULL && strcmp(exp->value, last->exp->value)) {
 		last = last->next;
 	}
 	if (last == NULL) {
-		scopeControl->tables[scopeControl->scope]->list[ hash ] = exp;
-	} else if (!strcmp(exp->name, last->name)) {
+		scopeControl->tables[scopeControl->scope]->list[ hash ] = newItem(exp);
+	} else if (!strcmp(exp->value, last->exp->value)) {
 		return 1;
 	} else {
-		last->next = exp;
+		last->next = newItem(exp);
 	}
 	return 0;
 }
 
 Exp* get(const char* name) {
-	Exp* exp = scopeControl->tables[scopeControl->scope]->list[ getHash(name) ];
-	while (exp != NULL && strcmp(name, exp->name)) {
-		exp = exp->next;
+	Item* item = scopeControl->tables[scopeControl->scope]->list[ getHash(name) ];
+	while (item != NULL && item->next != NULL  && strcmp(name, item->exp->value)) {
+		item = item->next;
 	}
-	return exp;
+	if (item == NULL)
+		return NULL;
+	return item->exp;
 }
 
 #endif

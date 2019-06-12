@@ -1,6 +1,5 @@
 %{
 	#include "syntactic.tab.h"
-	#include "comum.c"
 	#include "symbol-table.c"
 
 	int tokenUp(const int);
@@ -140,9 +139,7 @@ int tokenUp(const int token) {
 	if(token == IDENTIFIER)
 		yylval.exp = get(yytext);
 	if(token > 0 && yylval.exp == NULL)
-		yylval.exp = newExp(NULL, token, strdup(yytext));
-	/*if (strlen(yytext) < 2 || yytext[0] != '/' || !(yytext[1] == '*' || yytext[1] == '/'))
-		ECHO;*/
+		yylval.exp = newExp(strdup(yytext), token);
 	return token;
 }
 

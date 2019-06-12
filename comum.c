@@ -41,35 +41,32 @@ char* concat(int count, ...){
 }
 
 typedef struct Exp {
-	char* name;
-	int type;
 	char* value;
+	int token;
+	struct Exp* type;
 	struct Exp* next;
 } Exp;
 
-Exp* newExp(char* name, const int type, char* value){
+Exp* getType(const int token) {
+	return NULL;
+}
+
+Exp* newExp(char* value, const int token) {
 	Exp* exp = malloc(sizeof(Exp));
-	exp->name = name;
-	exp->type = type;
 	exp->value = value;
+	exp->token = token;
+	exp->type = getType(token);
 	exp->next = NULL;
 	return exp;
 }
 
-void freeExp(Exp* exp){
+void freeExp(Exp* exp) {
 	if (exp != NULL) {
-		free(exp->name);
 		free(exp->value);
+		freeExp(exp->type);
 		freeExp(exp->next);
 		free(exp);
 	}
-}
-
-void freeAllExp(int count, ...){
-	va_list ap;
-	va_start(ap, count);
-		freeExp(va_arg(ap, Exp*));
-	va_end(ap);
 }
 
 #endif
