@@ -47,15 +47,11 @@ typedef struct Exp {
 	struct Exp* next;
 } Exp;
 
-Exp* getType(const int token) {
-	return NULL;
-}
-
 Exp* newExp(char* value, const int token) {
 	Exp* exp = malloc(sizeof(Exp));
 	exp->value = value;
 	exp->token = token;
-	exp->type = getType(token);
+	exp->type = NULL;
 	exp->next = NULL;
 	return exp;
 }

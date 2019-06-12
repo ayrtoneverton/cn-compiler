@@ -131,7 +131,7 @@ int tokenUp(const int token) {
 			column = 0;
 			row++;
 		} else if (yytext[i] == '\t')
-			column += 8 - (column % 8);
+			column += 4;
 		else
 			column++;
 	}
@@ -144,6 +144,6 @@ int tokenUp(const int token) {
 }
 
 int yyerror(char* s) {
-	fprintf(stderr, "\n%s, row: %d, column: %d\n", s, row, column);
+	fprintf(stderr, "%s, row: %d, column: %d\n", s, row, column);
 	return 0;
 }

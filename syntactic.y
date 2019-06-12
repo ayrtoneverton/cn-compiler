@@ -107,7 +107,7 @@ unary_exp
 	;
 
 binary_exp
-	: unary_exp
+	: unary_exp															{ unary_exp(&$$, $1) }
 	| binary_exp binary_op unary_exp									{ binary_exp2(&$$, $1, $2, $3); }
 	;
 

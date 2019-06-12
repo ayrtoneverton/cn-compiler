@@ -12,9 +12,31 @@ void freeAllExp(int count, ...) {
 	va_end(ap);
 }
 
+void setType(Exp* exp) {
+	switch (exp->token) {
+		case CHAR_LITERAL:
+			exp->type = get("char");
+			break;
+		case INTEGER_LITERAL:
+			exp->type = get("int");
+			break;
+		case DECIMAL_LITERAL:
+			exp->type = get("float");
+			break;
+		case STRING_LITERAL:
+			exp->type = get("string");
+	}
+}
+
 void checkDef(Exp* exp) {
-	if (exp->token == IDENTIFIER)
-		yyerror("ERROR\n");
+	if (exp->token == IDENTIFIER && exp->type == NULL)
+		yyerror(concat(3, "error: '", exp->value, "' undeclared"));
+}
+
+void unary_exp(Exp** exp, Exp* exp1){
+	checkDef(exp1);
+	setType(exp1);
+	*exp = exp1;
 }
 
 void primary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
