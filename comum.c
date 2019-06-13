@@ -8,7 +8,11 @@
 enum {
 	EXP_FUNCTION = -20,
 	EXP_STRUCT,
-	EXP_TYPE
+	EXP_TYPE,
+	DEC_POINTER,
+	DEC_ARRAY,
+	DEC_POINTER_ARRAY,
+	EXP_OTHER
 };
 
 char* strdup(const char* src) {

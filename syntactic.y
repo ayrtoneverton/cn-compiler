@@ -142,7 +142,7 @@ declaration
 declaration_specifiers
 	: storage_class_specifier
 	| storage_class_specifier declaration_specifiers
-	| type_specifier
+	| type_specifier													{ declaration_specifiers3(&$$, $1); }			
 	| type_specifier declaration_specifiers
 	| type_qualifier
 	| type_qualifier declaration_specifiers
@@ -244,10 +244,10 @@ declarator
 	;
 
 direct_declarator
-	: IDENTIFIER
+	: IDENTIFIER														{ direct_declarator1(&$$, $1); }
 	| '(' declarator ')'
-	| direct_declarator '[' complex_exp ']'
-	| direct_declarator '[' ']'
+	| direct_declarator '[' complex_exp ']'								{ direct_declarator3(&$$, $1, $2, $3, $4); }
+	| direct_declarator '[' ']'											{ direct_declarator4(&$$, $1, $2, $3); }
 	| direct_declarator '(' parameter_type_list ')'
 	| direct_declarator '(' identifier_list ')'
 	| direct_declarator '(' ')'
