@@ -248,9 +248,9 @@ direct_declarator
 	| '(' declarator ')'
 	| direct_declarator '[' complex_exp ']'								{ direct_declarator3(&$$, $1, $2, $3, $4); }
 	| direct_declarator '[' ']'											{ direct_declarator4(&$$, $1, $2, $3); }
-	| direct_declarator '(' parameter_type_list ')'						{ direct_declarator5(&$$, $1, $2, $3, $4); }
+	| direct_declarator '(' { checkScope(); } parameter_type_list ')'	{ direct_declarator5(&$$, $1, $2, $4, $5); }
 	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')'
+	| direct_declarator '(' ')' 										{ direct_declarator7(&$$, $1, $2, $3); }
 	;
 
 pointer

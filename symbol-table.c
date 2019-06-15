@@ -104,6 +104,7 @@ int add(Exp* exp) {
 	} else {
 		last->next = newItem(exp);
 	}
+	/* printf("ADD %s, SCOPE %d\n", exp->value, scopeControl->scope); */
 	return 0;
 }
 
@@ -117,14 +118,28 @@ Exp* get(const char* name) {
 	return item->exp;
 }
 
+Exp* getInScope(int scp, const char* name){
+	Item* item = NULL;
+	if(scp <= scopeControl->scope){
+		item = scopeControl->tables[scp]->list[ getHash(name) ];
+		while (item != NULL && item->next != NULL  && strcmp(name, item->exp->value)) {
+			item = item->next;
+		}
+	}
+	if (item == NULL)
+		return NULL;
+	return item->exp;
+}
+
 Exp* getAll(const char* name){
 	int upScope = scopeControl->scope;
 	while (upScope >= 0){
-		Exp* exp = get(name);
+		Exp* exp = getInScope(upScope, name);
 		if(exp != NULL)
 			return exp;
 		upScope --;
 	}
+	printf("GETALL NULL FOR: %s\n", name);
 	return NULL;
 }
 
@@ -140,6 +155,7 @@ void initSymbolTable() {
 	add(newExp(strdup("float"), EXP_TYPE, NULL));
 	add(newExp(strdup("double"), EXP_TYPE, NULL));
 	add(newExp(strdup("void"), EXP_TYPE, NULL));
+	add(newExp(strdup("char"), EXP_TYPE, NULL));
 }
 
 #endif

@@ -45,8 +45,11 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 	while(declarator != NULL){
 		identifier = declarator->type;
-		identifier->type = exp1->type;
-		add(identifier);
+		if(get(identifier->value) != NULL)
+			yyerror(concat(3, "error: '", identifier->value, "' already declared"));
+
+		identifier->type = exp1->type; 
+		add(identifier);		
 		tmp = declarator;
 		declarator = declarator->next;
 		tmp->type = NULL;
@@ -63,7 +66,7 @@ void declaration_specifiers3(Exp** exp, Exp* exp1){
 	*exp = newExp(exp1->value, EXP_OTHER, getAll(exp1->value));
 	exp1->value = NULL;
 	freeExp(exp1);
-	/* printf("DE3: %s\n", (*exp)->value); */
+	/* printf("DE3: %s\n", (*exp)->type->value); */
 }
 
 void init_declarator_list1(Exp** exp, Exp* exp1){
@@ -119,22 +122,35 @@ void direct_declarator4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		yyerror(concat(5, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));
 }
 
-void direct_declarator5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
-	if(scopeControl->scope != 0)
-			yyerror("error: Function definition is not allowed here");
-	if (exp1->token == IDENTIFIER){
-		checkDef(exp1);		
-		*exp = newExp(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), DEC_FUNCTION, exp1->type);
+void direct_declarator5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4, Exp* exp5){
+	if (exp1->token == IDENTIFIER){	
+		*exp = newExp(concat(4, exp1->value, exp2->value, exp4->value, exp5->value), DEC_FUNCTION, exp1->type);
 		(*exp)->next = exp4;
 		/* printf("DD5: %s\n", (*exp)->value); */
 	}
 	else
-		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, exp4->value, "'is not a valid declaration"));
+		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp4->value, exp5->value, "'is not a valid declaration"));
+}
+
+void checkScope(){
+	if(scopeControl->scope != 0)
+		yyerror("error: Function definition is not allowed here");
+	inScope();
+}
+
+void direct_declarator7(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
+	checkScope();
+	if (exp1->token == IDENTIFIER){	
+		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), DEC_FUNCTION, exp1->type);
+	}
+	else
+		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));
 }
 
 void parameter_list1(Exp** exp, Exp* exp1){
 	*exp = newExp(concat(3, exp1->type->value, " " , exp1->value), EXP_OTHER, NULL);
 	(*exp)->next = exp1;
+	/* printf("PL1: %s\n", (*exp)->value); */
 }
 
 void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
@@ -159,26 +175,29 @@ void paramater_declaration(Exp** exp, Exp* exp1, Exp* exp2){
 
 	exp1->type = NULL;
 	freeExp(exp1);
+	/* printf("PD1: %s\n", (*exp)->value); */
 }
 
 void function_def_declaration(Exp* exp1, Exp* exp2){
-	Exp* identifier, * par;
+	Exp* par;
+	par = exp2->next;
 	if (exp2->token != DEC_FUNCTION)
 		yyerror(concat(5, "error: '", exp1->value, " ", exp2->value, "'is not a valid function declaration"));
-	identifier = exp2->type;
-	identifier->type = exp1->type;
-	add(identifier);
-
-	inScope();
-	par = exp2->next->next;
-	while(par != NULL){
-		Exp* new = newExp(strdup(par->value), IDENTIFIER, par->type);
-		add(new);
+	if(par != NULL){
 		par = par->next;
+		while(par != NULL){
+			Exp* new = newExp(strdup(par->value), IDENTIFIER, par->type);
+			add(new);
+			par = par->next;			
+		}
 	}
 }
 
 void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
+	Exp* identifier;
 	outScope();
+	identifier = exp2->type;
+	identifier->type = exp1->type;
+	add(identifier);
 	*exp = newExp(concat(3, exp1->value, exp2->value, exp4->value), EXP_OTHER, NULL);
 }
