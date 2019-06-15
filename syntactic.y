@@ -136,7 +136,7 @@ exp_list
 	;
 
 declaration
-	: declaration_specifiers init_declarator_list ';'
+	: declaration_specifiers init_declarator_list ';'					{ declaration(&$$, $1, $2, $3); }
 	;
 
 declaration_specifiers
@@ -149,13 +149,13 @@ declaration_specifiers
 	;
 
 init_declarator_list
-	: init_declarator
-	| init_declarator_list ',' init_declarator
+	: init_declarator 													{ init_declarator_list1(&$$, $1); }
+	| init_declarator_list ',' init_declarator 							{ init_declarator_list2(&$$, $1, $2, $3); }
 	;
 
 init_declarator
-	: declarator
-	| declarator '=' initializer
+	: declarator 														{ /* $$ = $1 */ }
+	| declarator '=' initializer 										
 	;
 
 storage_class_specifier
@@ -240,7 +240,7 @@ type_qualifier
 
 declarator
 	: pointer direct_declarator
-	| direct_declarator
+	| direct_declarator 												{ /*$$ = $1*/ }
 	;
 
 direct_declarator
@@ -248,7 +248,7 @@ direct_declarator
 	| '(' declarator ')'
 	| direct_declarator '[' complex_exp ']'								{ direct_declarator3(&$$, $1, $2, $3, $4); }
 	| direct_declarator '[' ']'											{ direct_declarator4(&$$, $1, $2, $3); }
-	| direct_declarator '(' parameter_type_list ')'
+	| direct_declarator '(' parameter_type_list ')'						{ direct_declarator5(&$$, $1, $2, $3, $4); }
 	| direct_declarator '(' identifier_list ')'
 	| direct_declarator '(' ')'
 	;
@@ -266,17 +266,17 @@ type_qualifier_list
 	;
 
 parameter_type_list
-	: parameter_list
+	: parameter_list 													{ /* $$ =$1 */ }
 	| parameter_list ',' ELLIPSIS
 	;
 
 parameter_list
-	: parameter_declaration
-	| parameter_list ',' parameter_declaration
+	: parameter_declaration												{ parameter_list1(&$$, $1); }
+	| parameter_list ',' parameter_declaration							{ parameter_list2(&$$, $1, $2, $3); }
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator
+	: declaration_specifiers declarator 								{ paramater_declaration(&$$, $1, $2); }
 	| declaration_specifiers abstract_declarator
 	| declaration_specifiers
 	;
@@ -353,7 +353,7 @@ switch_stm
 	;
 
 compound_stm
-	: '{' '}'
+	: '{' '}'															
 	| '{' stm_list '}'
 	| '{' declaration_list '}'
 	| '{' declaration_list stm_list '}'
@@ -395,21 +395,19 @@ jump_stm
 	| RETURN exp ';'
 	;
 
-translation_unit
-	: external_declaration
-	| translation_unit external_declaration
-	;
-
 external_declaration
 	: function_def
 	| declaration
 	;
 
 function_def
-	: declaration_specifiers declarator declaration_list compound_stm
-	| declaration_specifiers declarator compound_stm
-	| declarator declaration_list compound_stm
+	: declaration_specifiers declarator { function_def_declaration($1, $2); } compound_stm { function_def(&$$, $1, $2, $4); }
 	| declarator compound_stm
+	;
+
+	translation_unit
+	: external_declaration
+	| translation_unit external_declaration
 	;
 
 %%

@@ -117,6 +117,18 @@ Exp* get(const char* name) {
 	return item->exp;
 }
 
+Exp* getAll(const char* name){
+	int upScope = scopeControl->scope;
+	while (upScope >= 0){
+		Exp* exp = get(name);
+		if(exp != NULL)
+			return exp;
+		upScope --;
+	}
+	return NULL;
+}
+
+
 void initSymbolTable() {
 	scopeControl = malloc(sizeof(ScopeControl));
 	scopeControl->size = 0;
@@ -127,6 +139,7 @@ void initSymbolTable() {
 	add(newExp(strdup("long"), EXP_TYPE, NULL));
 	add(newExp(strdup("float"), EXP_TYPE, NULL));
 	add(newExp(strdup("double"), EXP_TYPE, NULL));
+	add(newExp(strdup("void"), EXP_TYPE, NULL));
 }
 
 #endif
