@@ -48,7 +48,8 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		if(get(identifier->value) != NULL)
 			yyerror(concat(3, "error: '", identifier->value, "' already declared"));
 
-		identifier->type = exp1->type; 
+		identifier->type = exp1->type;
+		identifier->token = declarator->token; 
 		add(identifier);		
 		tmp = declarator;
 		declarator = declarator->next;
@@ -94,20 +95,21 @@ void init_declarator_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 void direct_declarator1(Exp** exp, Exp* exp1){
 	checkNotDef(exp1);
-	*exp = newExp(strdup(exp1->value), IDENTIFIER, exp1);
+	*exp = newExp(strdup(exp1->value), EXP_VAR, exp1);
 	/* printf("DD1: %s\n", (*exp)->value); */
 }
 
 void direct_declarator3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
-	if (exp1->token == IDENTIFIER || exp1->token == DEC_ARRAY || exp1->token == DEC_POINTER){
+	if (exp1->token == EXP_VAR || exp1->token == EXP_ARRAY || exp1->token == EXP_POINTER){
 		int exp_token;
 		if(strcmp(exp3->type->value, "int"))
 			yyerror(concat(4, "error: size of array has no integer type '", exp3->type->value, "' = ", exp3->value));
 		
-		exp_token = exp1->token == DEC_POINTER ? DEC_POINTER_ARRAY : DEC_ARRAY;
+		exp_token = exp1->token == EXP_POINTER ? EXP_POINTER : EXP_ARRAY;
 
 		*exp = newExp(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), exp_token, exp1->type);
-
+		exp1->type = NULL;
+		exp2->type = NULL;
 		freeAllExp(2, exp1, exp3);
 	}
 	else{
@@ -116,16 +118,20 @@ void direct_declarator3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 }
 
 void direct_declarator4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
-	if (exp1->token == IDENTIFIER)
-		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), DEC_POINTER, exp1->type);
+	if (exp1->token == EXP_VAR)
+		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), EXP_POINTER, exp1->type);
 	else
 		yyerror(concat(5, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));
+	exp1->type = NULL;
+	freeExp(exp1);
 }
 
 void direct_declarator5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4, Exp* exp5){
-	if (exp1->token == IDENTIFIER){	
-		*exp = newExp(concat(4, exp1->value, exp2->value, exp4->value, exp5->value), DEC_FUNCTION, exp1->type);
+	if (exp1->token == EXP_VAR){	
+		*exp = newExp(concat(4, exp1->value, exp2->value, exp4->value, exp5->value), EXP_FUNCTION, exp1->type);
 		(*exp)->next = exp4;
+		exp1->type = NULL;
+		freeExp(exp1);
 		/* printf("DD5: %s\n", (*exp)->value); */
 	}
 	else
@@ -140,8 +146,10 @@ void checkScope(){
 
 void direct_declarator7(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	checkScope();
-	if (exp1->token == IDENTIFIER){	
-		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), DEC_FUNCTION, exp1->type);
+	if (exp1->token == EXP_VAR){	
+		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), EXP_FUNCTION, exp1->type);
+		exp1->type = NULL;
+		freeExp(exp1);
 	}
 	else
 		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));
@@ -171,33 +179,36 @@ void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 void paramater_declaration(Exp** exp, Exp* exp1, Exp* exp2){
 	*exp = exp2;
-	(*exp)->type = exp1->type;
-
-	exp1->type = NULL;
-	freeExp(exp1);
+	(*exp)->type->type = exp1->type;
 	/* printf("PD1: %s\n", (*exp)->value); */
 }
 
 void function_def_declaration(Exp* exp1, Exp* exp2){
 	Exp* par;
 	par = exp2->next;
-	if (exp2->token != DEC_FUNCTION)
+	if (exp2->token != EXP_FUNCTION)
 		yyerror(concat(5, "error: '", exp1->value, " ", exp2->value, "'is not a valid function declaration"));
 	if(par != NULL){
 		par = par->next;
 		while(par != NULL){
-			Exp* new = newExp(strdup(par->value), IDENTIFIER, par->type);
-			add(new);
+			Exp* local_var = par->type;
+			local_var->token = par->token;
+			par->type = local_var->type;
+			add(local_var);
 			par = par->next;			
 		}
 	}
 }
 
 void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
-	Exp* identifier;
+	Exp* function;
 	outScope();
-	identifier = exp2->type;
-	identifier->type = exp1->type;
-	add(identifier);
+	function = exp2->type;
+	function->type = exp1->type;
+	function->token = EXP_FUNCTION;
+	add(function);
 	*exp = newExp(concat(3, exp1->value, exp2->value, exp4->value), EXP_OTHER, NULL);
+	exp1->type = NULL;
+	exp2->type = NULL;
+	freeAllExp(2, exp1, exp2);
 }
