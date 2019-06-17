@@ -159,6 +159,8 @@ void initSymbolTable() {
 	add(newExp(strdup("double"), EXP_TYPE, NULL));
 	add(newExp(strdup("void"), EXP_TYPE, NULL));
 	add(newExp(strdup("char"), EXP_TYPE, NULL));
+	add(newExp(strdup("printf"), EXP_FUNCTION, NULL));
+	add(newExp(strdup("scanf"), EXP_FUNCTION, NULL));
 }
 
 #endif

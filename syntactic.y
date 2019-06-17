@@ -88,7 +88,7 @@ primary_exp
 	: IDENTIFIER 														{ primary_exp1(&$$, $1); }
 	| '(' exp ')'														{ primary_exp2(&$$, $1, $2, $3); }
 	| primary_exp '[' exp ']' 											{ primary_exp3(&$$, $1, $2, $3, $4); }
-	| primary_exp '(' ')'
+	| primary_exp '(' ')'												{ primary_exp4(&$$, $1, $2, $3); }
 	| primary_exp '(' exp_list ')'
 	| primary_exp '.' IDENTIFIER
 	| primary_exp PTR_OP IDENTIFIER
@@ -100,10 +100,10 @@ unary_exp
 	| CHAR_LITERAL
 	| DECIMAL_LITERAL
 	| STRING_LITERAL
-	| INC_OP IDENTIFIER
-	| DEC_OP IDENTIFIER
-	| IDENTIFIER INC_OP
-	| IDENTIFIER DEC_OP
+	| INC_OP IDENTIFIER													{ unary_exp67(&$$, $1, $2); }
+	| DEC_OP IDENTIFIER													{ unary_exp67(&$$, $1, $2); }
+	| IDENTIFIER INC_OP													{ unary_exp89(&$$, $1, $2); }
+	| IDENTIFIER DEC_OP													{ unary_exp89(&$$, $1, $2); }
 	;
 
 binary_exp
@@ -113,7 +113,7 @@ binary_exp
 
 complex_exp
 	: binary_exp
-	| unary_op binary_exp
+	| unary_op binary_exp												{ complex_exp2(&$$, $1, $2); }
 	| SIZEOF binary_exp
 	| SIZEOF '(' type_name ')'
 	| '(' type_name ')' binary_exp
@@ -121,7 +121,7 @@ complex_exp
 	;
 
 assignment_exp
-	: primary_exp assignment_op complex_exp
+	: primary_exp assignment_op complex_exp								{ assignment_exp(&$$, $1, $2, $3); }
 	| primary_exp assignment_op assignment_exp
 	;
 
@@ -353,10 +353,10 @@ switch_stm
 	;
 
 compound_stm
-	: '{' '}'															
-	| '{' stm_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list stm_list '}'
+	: '{' '}'															{ concatExp(&$$, $1, $2); }
+	| '{' stm_list '}'													{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list '}'											{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list stm_list '}'									{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4); }
 	;
 
 declaration_list
@@ -406,7 +406,7 @@ function_def
 	;
 
 	translation_unit
-	: external_declaration
+	: external_declaration													{ printf($1->value); }
 	| translation_unit external_declaration
 	;
 
