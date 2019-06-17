@@ -154,7 +154,7 @@ int tokenUp(const int token) {
 	}
 	yylval.exp = NULL;
 	if(token == IDENTIFIER)
-		yylval.exp = get(yytext);
+		yylval.exp = getAll(yytext);
 	if(token > 0 && yylval.exp == NULL)
 		yylval.exp = newExp(strdup(yytext), token, setType(token));
 	return token;
