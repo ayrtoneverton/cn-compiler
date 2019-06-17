@@ -24,10 +24,35 @@ void checkNotDef(Exp* exp){
 		yyerror(concat(3, "error: '", exp->value, "' already declared"));
 }
 
+void primary_exp1(Exp** exp, Exp* exp1){
+	Exp * id;
+	if(exp1->type == NULL){
+		Exp * id = getAll(exp1->value);
+		if(id == NULL)
+			yyerror(concat(3, "error: '", exp1->value, "' undeclared"));
+		freeExp(exp1);
+	}else{
+		id = exp1;
+	} 
+	*exp = id;
+}
+
 void primary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
-	checkDef(exp2);
-	*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), exp2->token, NULL);
+	*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), exp2->token, exp2->type);
+	exp2->type = NULL;
 	freeAllExp(3, exp1, exp2, exp3);
+}
+
+void primary_exp3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
+	if(exp1->token == EXP_FUNCTION || exp1->token == EXP_VAR)
+		yyerror(concat(3, "error: '", exp1->value, " is not an array or a pointer"));
+
+	if(strcmp(exp3->type->value, "int"))
+		yyerror(concat(4, "error: index has no integer type '", exp3->type->value, "' = ", exp3->value));
+
+	*exp = newExp(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), exp1->token, exp1->type);
+	exp1->type = NULL;
+	freeAllExp(4, exp1, exp2, exp3, exp4);
 }
 
 void binary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
