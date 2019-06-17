@@ -33,6 +33,13 @@ char* itoa(int val){
 	return &buf[i+1];
 }
 
+void freeAll(int count, ...){
+	va_list ap;
+	va_start(ap, count);
+		free(va_arg(ap, char*));
+	va_end(ap);
+}
+
 char* concat(int count, ...){
 	va_list ap;
 	int i;
