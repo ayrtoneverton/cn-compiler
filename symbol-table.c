@@ -104,7 +104,10 @@ int add(Exp* exp) {
 	} else {
 		last->next = newItem(exp);
 	}
-	/* printf("ADD %s, SCOPE %d\n", exp->value, scopeControl->scope); */
+	/*if(exp->type == NULL)
+		printf("ADDED [%d] NULL %s in SCOPE %d\n", exp->token, exp->value, scopeControl->scope);
+	else
+		printf("ADDED [%d] %s %s in SCOPE %d\n", exp->token, exp->type->value, exp->value, scopeControl->scope); */
 	return 0;
 }
 
