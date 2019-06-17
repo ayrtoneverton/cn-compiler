@@ -85,9 +85,9 @@ assignment_op
 	;
 
 primary_exp
-	: IDENTIFIER
+	: IDENTIFIER 														{ primary_exp1(&$$, $1); }
 	| '(' exp ')'														{ primary_exp2(&$$, $1, $2, $3); }
-	| primary_exp '[' exp ']'
+	| primary_exp '[' exp ']' 											{ primary_exp3(&$$, $1, $2, $3, $4); }
 	| primary_exp '(' ')'
 	| primary_exp '(' exp_list ')'
 	| primary_exp '.' IDENTIFIER
@@ -95,7 +95,7 @@ primary_exp
 	;
 
 unary_exp
-	: primary_exp
+	: primary_exp 														{/* $$ = $1 */}
 	| INTEGER_LITERAL
 	| CHAR_LITERAL
 	| DECIMAL_LITERAL
@@ -107,7 +107,7 @@ unary_exp
 	;
 
 binary_exp
-	: unary_exp
+	: unary_exp 														{/* $$ = $1 */}
 	| binary_exp binary_op unary_exp									{ binary_exp2(&$$, $1, $2, $3); }
 	;
 
