@@ -142,7 +142,6 @@ Exp* getAll(const char* name){
 			return exp;
 		upScope --;
 	}
-	printf("GETALL NULL FOR: %s\n", name);
 	return NULL;
 }
 
