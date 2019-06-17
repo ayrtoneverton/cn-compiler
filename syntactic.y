@@ -132,7 +132,7 @@ exp
 
 exp_list
 	: exp
-	| exp_list ',' exp
+	| exp_list ',' exp													{ exp_list(&$$, $1, $2); }
 	;
 
 declaration

@@ -63,6 +63,13 @@ void binary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	/* printf("%s\n", (*exp)->value); */
 }
 
+void exp_list(Exp** exp, Exp* exp1, Exp* exp2){
+	checkDef(exp1);
+	checkDef(exp2);
+	exp1-> next = exp2;
+	*exp = exp1;
+}
+
 void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	Exp* declarator = exp2->next;
 	Exp* identifier;
