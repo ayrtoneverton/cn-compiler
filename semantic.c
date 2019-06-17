@@ -221,20 +221,27 @@ void stm3(Exp** exp, Exp* exp1, Exp* exp2){
 	freeExp(exp2);
 }
 
+void selection_stm1(Exp** exp, Exp* exp3, Exp* exp5){
+	*exp = newExp(getIf(exp3->value, exp5->value), EXP_OTHER, NULL);
+	freeAllExp(2, exp3, exp5);
+}
+
+void selection_stm2(Exp** exp, Exp* exp3, Exp* exp5, Exp* exp7){
+	*exp = newExp(getIfElse(exp3->value, exp5->value, exp7->value), EXP_OTHER, NULL);
+	freeAllExp(3, exp3, exp5, exp7);
+}
+
 void iteration_stm1(Exp** exp, Exp* exp3, Exp* exp5){
 	*exp = newExp(getWhile(exp3->value, exp5->value), EXP_OTHER, NULL);
-	printf("%s\n", (*exp)->value);
 	freeAllExp(2, exp3, exp5);
 }
 
 void iteration_stm2(Exp** exp, Exp* exp2, Exp* exp5){
 	*exp = newExp(getDoWhile(exp5->value, exp2->value), EXP_OTHER, NULL);
-	printf("%s\n", (*exp)->value);
 	freeAllExp(2, exp2, exp5);
 }
 
 void iteration_stm34(Exp** exp, Exp* exp3, Exp* exp4, Exp* exp5, Exp* exp6){
 	*exp = newExp(getFor(exp3->value, exp4->value, exp5 ? exp5->value : NULL, exp6->value), EXP_OTHER, NULL);
-	printf("%s\n", (*exp)->value);
 	freeAllExp(2, exp3, exp4, exp5, exp6);
 }
