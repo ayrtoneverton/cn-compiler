@@ -361,12 +361,12 @@ compound_stm
 
 declaration_list
 	: declaration
-	| declaration_list declaration										{ concatExp(&$$, $1, $2); }
+	| declaration_list declaration										{ nextExp(&$$, $1, $2); }
 	;
 
 stm_list
 	: stm
-	| stm_list stm														{ concatExp(&$$, $1, $2); }
+	| stm_list stm														{ nextExp(&$$, $1, $2); }
 	;
 
 for_exp

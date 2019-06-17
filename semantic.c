@@ -16,6 +16,13 @@ void concatExp(Exp** exp, Exp* exp1, Exp* exp2) {
 	*exp = newExp(concat(2, exp1->value, exp2->value), EXP_OTHER, NULL);
 	freeAllExp(2, exp1, exp2);
 }
+void nextExp(Exp** exp, Exp* exp1, Exp* exp2) {
+	char* tmp = exp1->value;
+	exp1->value = concat(2, exp1->value, exp2->value);
+	exp1->next = exp2;
+	*exp = exp1;
+	free(tmp);
+}
 
 void checkDef(Exp* exp) {
 	if (exp->token == IDENTIFIER && exp->type == NULL)
@@ -146,12 +153,12 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 }
 
 void declaration_specifiers3(Exp** exp, Exp* exp1){
-	*exp = newExp(exp1->value, EXP_OTHER, getAll(exp1->value));
+	*exp = newExp(strdup(exp1->value), EXP_OTHER, getAll(exp1->value));
 	freeExp(exp1);
 }
 
 void init_declarator_list1(Exp** exp, Exp* exp1){
-	*exp = newExp(concat(1, exp1->value), EXP_OTHER, NULL);
+	*exp = newExp(strdup(exp1->value), EXP_OTHER, NULL);
 	(*exp)->next = exp1;
 }
 
@@ -164,7 +171,7 @@ void init_declarator_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	(*exp)->value = concat(3, exp1->value, exp2->value, exp3->value);
 	free(tmp);
 
-	last = (*exp)->next;
+	last = *exp;
 	while(last->next != NULL){
 		last = last->next;
 	}
@@ -246,7 +253,7 @@ void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	(*exp)->value = concat(5, exp1->value, exp2->value, exp3->type->value, " ", exp3->value);
 	free(tmp);
 
-	last = (*exp)->next;
+	last = *exp;
 	while(last->next != NULL){
 		last = last->next;
 	}
