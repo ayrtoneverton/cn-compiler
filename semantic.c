@@ -1,7 +1,7 @@
-		
 #include <string.h>
 #include "syntactic.tab.h"
 #include "symbol-table.c"
+#include "converter.c"
 
 void freeAllExp(int count, ...) {
 	Exp* exp;
@@ -236,4 +236,30 @@ void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
 	exp1->type = NULL;
 	exp2->type = NULL;
 	freeAllExp(2, exp1, exp2);
+}
+
+void stm3(Exp** exp, Exp* exp1, Exp* exp2){
+	char* tmp = exp1->value;
+	exp1->value = concat(2, exp1->value, exp2->value);
+	*exp = exp1;
+	free(tmp);
+	freeExp(exp2);
+}
+
+void iteration_stm1(Exp** exp, Exp* exp3, Exp* exp5){
+	*exp = newExp(getWhile(exp3->value, exp5->value), EXP_OTHER, NULL);
+	printf("%s\n", (*exp)->value);
+	freeAllExp(2, exp3, exp5);
+}
+
+void iteration_stm2(Exp** exp, Exp* exp2, Exp* exp5){
+	*exp = newExp(getDoWhile(exp5->value, exp2->value), EXP_OTHER, NULL);
+	printf("%s\n", (*exp)->value);
+	freeAllExp(2, exp2, exp5);
+}
+
+void iteration_stm34(Exp** exp, Exp* exp3, Exp* exp4, Exp* exp5, Exp* exp6){
+	*exp = newExp(getFor(exp3->value, exp4->value, exp5 ? exp5->value : NULL, exp6->value), EXP_OTHER, NULL);
+	printf("%s\n", (*exp)->value);
+	freeAllExp(2, exp3, exp4, exp5, exp6);
 }

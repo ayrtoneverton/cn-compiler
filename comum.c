@@ -24,6 +24,22 @@ char* strdup(const char* src) {
 	return dist;
 }
 
+char* itoa(int val){
+	static char buf[32] = {0};
+	char* cr = "0123456789";
+	int i = 30;
+	for(; val && i ; --i, val /= 10)
+		buf[i] = cr[val % 10];
+	return &buf[i+1];
+}
+
+void freeAll(int count, ...){
+	va_list ap;
+	va_start(ap, count);
+		free(va_arg(ap, char*));
+	va_end(ap);
+}
+
 char* concat(int count, ...){
 	va_list ap;
 	int i;
