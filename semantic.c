@@ -128,7 +128,7 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		tmp = declarator;
 		declarator = declarator->next;
 		tmp->token = EXP_OTHER;
-		freeExp(tmp);
+		/*freeExp(tmp);*/
 	}
 	*exp = newExp(concat(4, exp1->value, " ", exp2->value, exp3->value), EXP_OTHER, NULL);
 	exp1->type = NULL;
@@ -136,7 +136,7 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 }
 
 void declaration_specifiers3(Exp** exp, Exp* exp1){
-	*exp = newExp(exp1->value, EXP_OTHER, getAll(exp1->value));
+	*exp = newExp(strdup(exp1->value), EXP_OTHER, getAll(exp1->value));
 	freeExp(exp1);
 }
 
