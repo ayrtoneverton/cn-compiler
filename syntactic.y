@@ -323,7 +323,7 @@ initializer_list
 stm
 	: labeled_stm
 	| compound_stm
-	| exp ';'															{ stm3(&$$, $1, $2); }
+	| exp ';'
 	| selection_stm
 	| iteration_stm
 	| jump_stm
@@ -381,10 +381,10 @@ selection_stm
 	;
 
 iteration_stm
-	: WHILE '(' exp ')' stm												{ iteration_stm1(&$$, $3, $5); }
-	| DO stm WHILE '(' exp ')' ';'										{ iteration_stm2(&$$, $2, $5); }
-	| FOR '(' for_exp for_exp ')' stm									{ iteration_stm34(&$$, $3, $4, NULL, $6); }
-	| FOR '(' for_exp for_exp exp_list ')' stm							{ iteration_stm34(&$$, $3, $4, $5, $7); }
+	: WHILE '(' exp ')' stm
+	| DO stm WHILE '(' exp ')' ';'
+	| FOR '(' for_exp for_exp ')' stm
+	| FOR '(' for_exp for_exp exp_list ')' stm
 	;
 
 jump_stm

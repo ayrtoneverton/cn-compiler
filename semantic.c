@@ -34,7 +34,7 @@ void primary_exp1(Exp** exp, Exp* exp1){
 	}else{
 		id = exp1;
 	} 
-	*exp = id;
+	*exp = newExp(strdup(id->value), id->token, id->type);
 }
 
 void primary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
