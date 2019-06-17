@@ -375,8 +375,8 @@ for_exp
 	;
 
 selection_stm
-	: IF '(' exp ')' stm
-	| IF '(' exp ')' stm ELSE stm
+	: IF '(' exp ')' stm												{ selection_stm1(&$$, $3, $5); }
+	| IF '(' exp ')' stm ELSE stm										{ selection_stm2(&$$, $3, $5, $7); }
 	| switch_stm
 	;
 
