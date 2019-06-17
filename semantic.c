@@ -8,7 +8,6 @@ void freeAllExp(int count, ...) {
 	va_list ap;
 	va_start(ap, count);
 		exp = va_arg(ap, Exp*);
-		if (exp->token != IDENTIFIER)
 			freeExp(exp);
 	va_end(ap);
 }
@@ -23,8 +22,8 @@ void checkDef(Exp* exp) {
 		yyerror(concat(3, "error: '", exp->value, "' undeclared"));
 }
 
-void checkNotDef(Exp* exp){
-	if (exp->type != NULL)
+void checkNotDef(Exp* exp){		
+	if (get(exp->value) != NULL)
 		yyerror(concat(3, "error: '", exp->value, "' already declared"));
 }
 
@@ -138,18 +137,16 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		add(identifier);
 		tmp = declarator;
 		declarator = declarator->next;
-		tmp->type = NULL;
-		tmp->next = NULL;
+		tmp->token = EXP_OTHER;
 		freeExp(tmp);
 	}
 	*exp = newExp(concat(4, exp1->value, " ", exp2->value, exp3->value), EXP_OTHER, NULL);
 	exp1->type = NULL;
-	freeAllExp(2, exp1, exp2);
+	freeAllExp(3, exp1, exp2, exp3);
 }
 
 void declaration_specifiers3(Exp** exp, Exp* exp1){
 	*exp = newExp(exp1->value, EXP_OTHER, getAll(exp1->value));
-	exp1->value = NULL;
 	freeExp(exp1);
 }
 
@@ -172,6 +169,8 @@ void init_declarator_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		last = last->next;
 	}
 	last->next = exp3;
+
+	freeExp(exp2);
 }
 
 void direct_declarator1(Exp** exp, Exp* exp1){
@@ -184,12 +183,11 @@ void direct_declarator3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 		int exp_token;
 		if(strcmp(exp3->type->value, "int"))
 			yyerror(concat(4, "error: size of array has no integer type '", exp3->type->value, "' = ", exp3->value));
-				exp_token = exp1->token == EXP_POINTER ? EXP_POINTER : EXP_ARRAY;
 
+		exp_token = exp1->token == EXP_POINTER ? EXP_POINTER : EXP_ARRAY;
 		*exp = newExp(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), exp_token, exp1->type);
-		exp1->type = NULL;
-		exp2->type = NULL;
-		freeAllExp(2, exp1, exp3);
+		exp1->token = EXP_OTHER;
+		freeAllExp(4, exp1, exp2, exp3, exp4);
 	}
 	else{
 		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, exp4->value, "'is not a valid declaration"));
@@ -201,16 +199,17 @@ void direct_declarator4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), EXP_POINTER, exp1->type);
 	else
 		yyerror(concat(5, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));
-	exp1->type = NULL;
-	freeExp(exp1);
+	
+	exp1->token = EXP_OTHER;
+	freeAllExp(3, exp1, exp2, exp3);
 }
 
 void direct_declarator5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4, Exp* exp5){
 	if (exp1->token == EXP_VAR){
 		*exp = newExp(concat(4, exp1->value, exp2->value, exp4->value, exp5->value), EXP_FUNCTION, exp1->type);
 		(*exp)->next = exp4;
-		exp1->type = NULL;
-		freeExp(exp1);
+		exp1->token = EXP_OTHER;
+		freeAllExp(3, exp1, exp2, exp5);
 	}
 	else
 		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp4->value, exp5->value, "'is not a valid declaration"));
@@ -226,8 +225,8 @@ void direct_declarator7(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	checkScope();
 	if (exp1->token == EXP_VAR){
 		*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), EXP_FUNCTION, exp1->type);
-		exp1->type = NULL;
-		freeExp(exp1);
+		exp1->token = EXP_OTHER;
+		freeAllExp(3, exp1, exp2, exp3);
 	}
 	else
 		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, "'is not a valid declaration"));

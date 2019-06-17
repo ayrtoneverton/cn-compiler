@@ -79,10 +79,12 @@ Exp* newExp(char* value, const int token, Exp* type) {
 
 void freeExp(Exp* exp) {
 	if (exp != NULL) {
-		free(exp->value);
-		freeExp(exp->type);
-		freeExp(exp->next);
-		free(exp);
+		if (exp->token != EXP_POINTER || exp->token != EXP_FUNCTION || exp->token != EXP_VAR || exp->token != EXP_TYPE){
+			free(exp->value);
+			freeExp(exp->type);
+			freeExp(exp->next);
+			free(exp);
+		}
 	}
 }
 
