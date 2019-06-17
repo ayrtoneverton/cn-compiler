@@ -59,11 +59,21 @@ void primary_exp3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 }
 
 void primary_exp4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
+	char* tmp = exp1->value;
 	checkDef(exp1);
-	free(exp1->value);
 	exp1->value = concat(3, exp1->value, exp2->value, exp3->value);
 	*exp = exp1;
+	free(tmp);
 	freeAllExp(2, exp2, exp3);
+}
+
+void primary_exp5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
+	char* tmp = exp1->value;
+	checkDef(exp1);
+	exp1->value = concat(4, exp1->value, exp2->value, exp3->value, exp4->value);
+	*exp = exp1;
+	free(tmp);
+	freeAllExp(3, exp2, exp3, exp4);
 }
 
 void unary_exp67(Exp** exp, Exp* exp1, Exp* exp2){
