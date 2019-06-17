@@ -89,7 +89,7 @@ primary_exp
 	| '(' exp ')'														{ primary_exp2(&$$, $1, $2, $3); }
 	| primary_exp '[' exp ']' 											{ primary_exp3(&$$, $1, $2, $3, $4); }
 	| primary_exp '(' ')'												{ primary_exp4(&$$, $1, $2, $3); }
-	| primary_exp '(' exp_list ')'										{ primary_exp5(&$$, $1, $2, $3, $4); }
+	| primary_exp '(' exp_list ')'
 	| primary_exp '.' IDENTIFIER
 	| primary_exp PTR_OP IDENTIFIER
 	;
@@ -323,7 +323,7 @@ initializer_list
 stm
 	: labeled_stm
 	| compound_stm
-	| exp ';'															{ concatExp(&$$, $1, $2); }
+	| exp ';'
 	| selection_stm
 	| iteration_stm
 	| jump_stm
@@ -371,7 +371,7 @@ stm_list
 
 for_exp
 	: ';'
-	| exp_list ';'														{ concatExp(&$$, $1, $2); }
+	| exp_list ';'
 	;
 
 selection_stm
@@ -381,18 +381,18 @@ selection_stm
 	;
 
 iteration_stm
-	: WHILE '(' exp ')' stm												{ iteration_stm1(&$$, $3, $5); }
-	| DO stm WHILE '(' exp ')' ';'										{ iteration_stm2(&$$, $2, $5); }
-	| FOR '(' for_exp for_exp ')' stm									{ iteration_stm34(&$$, $3, $4, NULL, $6); }
-	| FOR '(' for_exp for_exp exp_list ')' stm							{ iteration_stm34(&$$, $3, $4, $5, $7); }
+	: WHILE '(' exp ')' stm
+	| DO stm WHILE '(' exp ')' ';'
+	| FOR '(' for_exp for_exp ')' stm
+	| FOR '(' for_exp for_exp exp_list ')' stm
 	;
 
 jump_stm
-	: GOTO IDENTIFIER ';'												{ concatExp(&$$, $1, $2); }
-	| CONTINUE ';'														{ concatExp(&$$, $1, $2); }
-	| BREAK ';'															{ concatExp(&$$, $1, $2); }
-	| RETURN ';'														{ concatExp(&$$, $1, $2); }
-	| RETURN exp ';'													{ concatExp(&$$, $1, $2); }
+	: GOTO IDENTIFIER ';'
+	| CONTINUE ';'
+	| BREAK ';'
+	| RETURN ';'
+	| RETURN exp ';'
 	;
 
 external_declaration
@@ -402,11 +402,11 @@ external_declaration
 
 function_def
 	: declaration_specifiers declarator { function_def_declaration($1, $2); } compound_stm { function_def(&$$, $1, $2, $4); }
-	| declarator compound_stm											{ concatExp(&$$, $1, $2); }
+	| declarator compound_stm
 	;
 
 	translation_unit
-	: external_declaration												{ printf($1->value); }
+	: external_declaration													{ printf($1->value); }
 	| translation_unit external_declaration
 	;
 
