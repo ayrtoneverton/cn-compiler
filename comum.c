@@ -1,6 +1,3 @@
-#ifndef comum_c
-#define comum_c
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -87,5 +84,3 @@ void freeExp(Exp* exp) {
 		}
 	}
 }
-
-#endif

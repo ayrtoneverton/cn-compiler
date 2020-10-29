@@ -14,7 +14,7 @@ lex.yy.c: lexicon.l
 	flex lexicon.l
 
 clean:
-	del -f *.yy.c *.yy.h *.tab.c *.tab.h *.output *.dot
+	rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.output *.dot
 
 clean-all: clean
-	del -f $(CPNAME)
+	rm -f $(CPNAME)

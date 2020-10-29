@@ -1,6 +1,4 @@
 #include <string.h>
-#include "syntactic.tab.h"
-#include "symbol-table.c"
 #include "converter.c"
 
 void freeAllExp(int count, ...) {
@@ -37,10 +35,11 @@ void checkNotDef(Exp* exp){
 void primary_exp1(Exp** exp, Exp* exp1){
 	Exp * id;
 	if(exp1->type == NULL){
-		Exp * id = getAll(exp1->value);
+		id = getAll(exp1->value);
 		if(id == NULL)
 			yyerror(concat(3, "error: '", exp1->value, "' undeclared"));
-		freeExp(exp1);
+		if (exp1 != id)
+			freeExp(exp1);
 	}else{
 		id = exp1;
 	}
@@ -57,7 +56,7 @@ void primary_exp3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 	if(exp1->token == EXP_FUNCTION || exp1->token == EXP_VAR)
 		yyerror(concat(3, "error: '", exp1->value, " is not an array or a pointer"));
 
-	if(strcmp(exp3->type->value, "int"))
+	if(exp3->type != NULL && strcmp(exp3->type->value, "int"))
 		yyerror(concat(4, "error: index has no integer type '", exp3->type->value, "' = ", exp3->value));
 
 	*exp = newExp(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), exp1->token, exp1->type);
@@ -75,11 +74,9 @@ void primary_exp4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 }
 
 void primary_exp5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
-	char* tmp = exp1->value;
 	checkDef(exp1);
 	exp1->value = concat(4, exp1->value, exp2->value, exp3->value, exp4->value);
 	*exp = exp1;
-	free(tmp);
 	freeAllExp(3, exp2, exp3, exp4);
 }
 
@@ -125,7 +122,7 @@ void assignment_exp(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 void exp_list(Exp** exp, Exp* exp1, Exp* exp2){
 	checkDef(exp1);
 	checkDef(exp2);
-	exp1-> next = exp2;
+	exp1->next = exp2;
 	*exp = exp1;
 }
 
@@ -180,6 +177,10 @@ void init_declarator_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	freeExp(exp2);
 }
 
+void init_declarator(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
+	(*exp)->value = concat(3, exp1->value, exp2->value, exp3->value);
+}
+
 void direct_declarator1(Exp** exp, Exp* exp1){
 	checkNotDef(exp1);
 	*exp = newExp(strdup(exp1->value), EXP_VAR, exp1);
@@ -188,7 +189,7 @@ void direct_declarator1(Exp** exp, Exp* exp1){
 void direct_declarator3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 	if (exp1->token == EXP_VAR || exp1->token == EXP_ARRAY || exp1->token == EXP_POINTER){
 		int exp_token;
-		if(strcmp(exp3->type->value, "int"))
+		if(exp3->type != NULL && strcmp(exp3->type->value, "int"))
 			yyerror(concat(4, "error: size of array has no integer type '", exp3->type->value, "' = ", exp3->value));
 
 		exp_token = exp1->token == EXP_POINTER ? EXP_POINTER : EXP_ARRAY;
@@ -240,7 +241,10 @@ void direct_declarator7(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 }
 
 void parameter_list1(Exp** exp, Exp* exp1){
-	*exp = newExp(concat(3, exp1->type->value, " " , exp1->value), EXP_OTHER, NULL);
+	if(exp1->type != NULL)
+		*exp = newExp(concat(3, exp1->type->value, " " , exp1->value), EXP_OTHER, NULL);
+	else
+		*exp = newExp(strdup(exp1->value), EXP_OTHER, NULL);
 	(*exp)->next = exp1;
 }
 
@@ -250,7 +254,10 @@ void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 	*exp = exp1;
 	tmp = (*exp)->value;
-	(*exp)->value = concat(5, exp1->value, exp2->value, exp3->type->value, " ", exp3->value);
+	if(exp3->type != NULL)
+		(*exp)->value = concat(5, exp1->value, exp2->value, exp3->type->value, " ", exp3->value);
+	else
+		(*exp)->value = concat(3, exp1->value, exp2->value, exp3->value);
 	free(tmp);
 
 	last = *exp;
@@ -262,7 +269,8 @@ void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 void paramater_declaration(Exp** exp, Exp* exp1, Exp* exp2){
 	*exp = exp2;
-	(*exp)->type->type = exp1->type;
+	if((*exp)->type != NULL)
+		(*exp)->type->type = exp1->type;
 }
 
 void function_def_declaration(Exp* exp1, Exp* exp2){

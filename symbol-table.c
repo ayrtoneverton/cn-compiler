@@ -1,9 +1,5 @@
-#ifndef symbol_table_c
-#define symbol_table_c
-
 #include <limits.h>
 #include <string.h>
-#include "comum.c"
 
 typedef struct Item {
 	struct Exp* exp;
@@ -32,9 +28,11 @@ Item* newItem(Exp* exp) {
 
 void freeItem(Item* item) {
 	if (item != NULL) {
+		/*
 		freeExp(item->exp);
 		freeItem(item->next);
 		free(item);
+		*/
 	}
 }
 
@@ -161,5 +159,3 @@ void initSymbolTable() {
 	add(newExp(strdup("printf"), EXP_FUNCTION, NULL));
 	add(newExp(strdup("scanf"), EXP_FUNCTION, NULL));
 }
-
-#endif

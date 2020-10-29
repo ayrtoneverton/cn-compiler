@@ -85,35 +85,35 @@ assignment_op
 	;
 
 primary_exp
-	: IDENTIFIER 														{ primary_exp1(&$$, $1); }
-	| '(' exp ')'														{ primary_exp2(&$$, $1, $2, $3); }
-	| primary_exp '[' exp ']' 											{ primary_exp3(&$$, $1, $2, $3, $4); }
-	| primary_exp '(' ')'												{ primary_exp4(&$$, $1, $2, $3); }
-	| primary_exp '(' exp_list ')'
+	: IDENTIFIER 																							{ primary_exp1(&$$, $1); }
+	| '(' exp ')'																							{ primary_exp2(&$$, $1, $2, $3); }
+	| primary_exp '[' exp ']' 																{ primary_exp3(&$$, $1, $2, $3, $4); }
+	| primary_exp '(' ')'																			{ primary_exp4(&$$, $1, $2, $3); }
+	| primary_exp '(' exp_list ')'														{ primary_exp5(&$$, $1, $2, $3, $4); }
 	| primary_exp '.' IDENTIFIER
 	| primary_exp PTR_OP IDENTIFIER
 	;
 
 unary_exp
-	: primary_exp 														{/* $$ = $1 */}
+	: primary_exp
 	| INTEGER_LITERAL
 	| CHAR_LITERAL
 	| DECIMAL_LITERAL
 	| STRING_LITERAL
-	| INC_OP IDENTIFIER													{ unary_exp67(&$$, $1, $2); }
-	| DEC_OP IDENTIFIER													{ unary_exp67(&$$, $1, $2); }
-	| IDENTIFIER INC_OP													{ unary_exp89(&$$, $1, $2); }
-	| IDENTIFIER DEC_OP													{ unary_exp89(&$$, $1, $2); }
+	| INC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2); }
+	| DEC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2); }
+	| IDENTIFIER INC_OP																				{ unary_exp89(&$$, $1, $2); }
+	| IDENTIFIER DEC_OP																				{ unary_exp89(&$$, $1, $2); }
 	;
 
 binary_exp
-	: unary_exp 														{/* $$ = $1 */}
-	| binary_exp binary_op unary_exp									{ binary_exp2(&$$, $1, $2, $3); }
+	: unary_exp
+	| binary_exp binary_op unary_exp													{ binary_exp2(&$$, $1, $2, $3); }
 	;
 
 complex_exp
 	: binary_exp
-	| unary_op binary_exp												{ complex_exp2(&$$, $1, $2); }
+	| unary_op binary_exp																			{ complex_exp2(&$$, $1, $2); }
 	| SIZEOF binary_exp
 	| SIZEOF '(' type_name ')'
 	| '(' type_name ')' binary_exp
@@ -121,7 +121,7 @@ complex_exp
 	;
 
 assignment_exp
-	: primary_exp assignment_op complex_exp								{ assignment_exp(&$$, $1, $2, $3); }
+	: primary_exp assignment_op complex_exp										{ assignment_exp(&$$, $1, $2, $3); }
 	| primary_exp assignment_op assignment_exp
 	;
 
@@ -132,7 +132,7 @@ exp
 
 exp_list
 	: exp
-	| exp_list ',' exp													{ exp_list(&$$, $1, $2); }
+	| exp_list ',' exp																				{ exp_list(&$$, $1, $2); }
 	;
 
 declaration
@@ -142,20 +142,20 @@ declaration
 declaration_specifiers
 	: storage_class_specifier
 	| storage_class_specifier declaration_specifiers
-	| type_specifier													{ declaration_specifiers3(&$$, $1); }			
+	| type_specifier																					{ declaration_specifiers3(&$$, $1); }
 	| type_specifier declaration_specifiers
 	| type_qualifier
 	| type_qualifier declaration_specifiers
 	;
 
 init_declarator_list
-	: init_declarator 													{ init_declarator_list1(&$$, $1); }
-	| init_declarator_list ',' init_declarator 							{ init_declarator_list2(&$$, $1, $2, $3); }
+	: init_declarator 																				{ init_declarator_list1(&$$, $1); }
+	| init_declarator_list ',' init_declarator 								{ init_declarator_list2(&$$, $1, $2, $3); }
 	;
 
 init_declarator
-	: declarator 														{ /* $$ = $1 */ }
-	| declarator '=' initializer 										
+	: declarator
+	| declarator '=' initializer 															{ init_declarator(&$$, $1, $2, $3); }
 	;
 
 storage_class_specifier
@@ -240,17 +240,17 @@ type_qualifier
 
 declarator
 	: pointer direct_declarator
-	| direct_declarator 												{ /*$$ = $1*/ }
+	| direct_declarator
 	;
 
 direct_declarator
-	: IDENTIFIER														{ direct_declarator1(&$$, $1); }
+	: IDENTIFIER																											{ direct_declarator1(&$$, $1); }
 	| '(' declarator ')'
-	| direct_declarator '[' complex_exp ']'								{ direct_declarator3(&$$, $1, $2, $3, $4); }
-	| direct_declarator '[' ']'											{ direct_declarator4(&$$, $1, $2, $3); }
+	| direct_declarator '[' complex_exp ']'														{ direct_declarator3(&$$, $1, $2, $3, $4); }
+	| direct_declarator '[' ']'																				{ direct_declarator4(&$$, $1, $2, $3); }
 	| direct_declarator '(' { checkScope(); } parameter_type_list ')'	{ direct_declarator5(&$$, $1, $2, $4, $5); }
 	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')' 										{ direct_declarator7(&$$, $1, $2, $3); }
+	| direct_declarator '(' ')' 																			{ direct_declarator7(&$$, $1, $2, $3); }
 	;
 
 pointer
@@ -266,17 +266,17 @@ type_qualifier_list
 	;
 
 parameter_type_list
-	: parameter_list 													{ /* $$ =$1 */ }
+	: parameter_list
 	| parameter_list ',' ELLIPSIS
 	;
 
 parameter_list
-	: parameter_declaration												{ parameter_list1(&$$, $1); }
-	| parameter_list ',' parameter_declaration							{ parameter_list2(&$$, $1, $2, $3); }
+	: parameter_declaration																						{ parameter_list1(&$$, $1); }
+	| parameter_list ',' parameter_declaration												{ parameter_list2(&$$, $1, $2, $3); }
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator 								{ paramater_declaration(&$$, $1, $2); }
+	: declaration_specifiers declarator 															{ paramater_declaration(&$$, $1, $2); }
 	| declaration_specifiers abstract_declarator
 	| declaration_specifiers
 	;
@@ -323,7 +323,7 @@ initializer_list
 stm
 	: labeled_stm
 	| compound_stm
-	| exp ';'
+	| exp ';'																													{ concatExp(&$$, $1, $2); }
 	| selection_stm
 	| iteration_stm
 	| jump_stm
@@ -353,30 +353,30 @@ switch_stm
 	;
 
 compound_stm
-	: '{' '}'															{ concatExp(&$$, $1, $2); }
-	| '{' stm_list '}'													{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
-	| '{' declaration_list '}'											{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
-	| '{' declaration_list stm_list '}'									{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4); }
+	: '{' '}'																										{ concatExp(&$$, $1, $2); }
+	| '{' stm_list '}'																					{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list '}'																	{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list stm_list '}'													{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4); }
 	;
 
 declaration_list
 	: declaration
-	| declaration_list declaration										{ nextExp(&$$, $1, $2); }
+	| declaration_list declaration															{ nextExp(&$$, $1, $2); }
 	;
 
 stm_list
 	: stm
-	| stm_list stm														{ nextExp(&$$, $1, $2); }
+	| stm_list stm																							{ nextExp(&$$, $1, $2); }
 	;
 
 for_exp
 	: ';'
-	| exp_list ';'
+	| exp_list ';'																							{ concatExp(&$$, $1, $2); }
 	;
 
 selection_stm
-	: IF '(' exp ')' stm												{ selection_stm1(&$$, $3, $5); }
-	| IF '(' exp ')' stm ELSE stm										{ selection_stm2(&$$, $3, $5, $7); }
+	: IF '(' exp ')' stm																				{ selection_stm1(&$$, $3, $5); }
+	| IF '(' exp ')' stm ELSE stm																{ selection_stm2(&$$, $3, $5, $7); }
 	| switch_stm
 	;
 
@@ -388,11 +388,11 @@ iteration_stm
 	;
 
 jump_stm
-	: GOTO IDENTIFIER ';'
-	| CONTINUE ';'
-	| BREAK ';'
-	| RETURN ';'
-	| RETURN exp ';'
+	: GOTO IDENTIFIER ';'													{ concatExp(&$$, $1, $2); }
+	| CONTINUE ';'																{ concatExp(&$$, $1, $2); }
+	| BREAK ';'																		{ concatExp(&$$, $1, $2); }
+	| RETURN ';'																	{ concatExp(&$$, $1, $2); }
+	| RETURN exp ';'															{ concatExp(&$$, $1, newExp(" ", 0, NULL)); concatExp(&$$, $$, $2); concatExp(&$$, $$, $3); }
 	;
 
 external_declaration
@@ -406,7 +406,7 @@ function_def
 	;
 
 	translation_unit
-	: external_declaration													{ printf($1->value); }
+	: external_declaration													{ printf("%s", $1->value); }
 	| translation_unit external_declaration
 	;
 
@@ -414,12 +414,12 @@ function_def
 
 int main(int argc, char* argv[]) {
 	if (!argv[1]) {
-		printf("Enter the file path in the first parameter\n");
+		printf("Enter the path of the cn file in the first parameter\n");
 		exit(1);
 	}
 	yyin = fopen(argv[1], "r");
 	if (!yyin) {
-		printf("Could not use file \"%s\"\n", argv[1]);
+		printf("Could not use the file \"%s\"\n", argv[1]);
 		exit(1);
 	}
 	initSymbolTable();

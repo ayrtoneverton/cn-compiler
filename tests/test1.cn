@@ -1,6 +1,5 @@
-#include <stdio.h>
 
-int main(int argc, const char *argv[]){
+int main(){
 	int x, y, c = 0;
 	printf("Enter value X: ");
 	scanf("%d", &x);
