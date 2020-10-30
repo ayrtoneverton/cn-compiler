@@ -147,20 +147,23 @@ int tokenUp(const int token) {
 		if (yytext[i] == '\n'){
 			column = 0;
 			row++;
-		} else if (yytext[i] == '\t')
-			column += 4;
-		else
+		} else
 			column++;
 	}
 	yylval.exp = NULL;
 	if(token == IDENTIFIER)
 		yylval.exp = getAll(yytext);
 	if(token > 0 && yylval.exp == NULL)
-		yylval.exp = newExp(strdup(yytext), token, getType(token));
+		yylval.exp = newExp3(strdup(yytext), token, getType(token));
 	return token;
 }
 
-int yyerror(char* s) {
+void show(char* s) {
 	fprintf(stderr, "%s, row: %d, column: %d\n", s, row, column);
-	return 0;
+}
+
+int yyerror(char* s) {
+	show(s);
+	abort();
+	return 1;
 }

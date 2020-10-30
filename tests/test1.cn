@@ -1,5 +1,5 @@
 
-int main(){
+int main() {
 	int x, y, c = 0;
 	printf("Enter value X: ");
 	scanf("%d", &x);

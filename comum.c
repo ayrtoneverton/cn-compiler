@@ -65,22 +65,38 @@ typedef struct Exp {
 	struct Exp* next;
 } Exp;
 
-Exp* newExp(char* value, const int token, Exp* type) {
+Exp* newExp(char* value, const int token) {
 	Exp* exp = malloc(sizeof(Exp));
 	exp->value = value;
 	exp->token = token;
-	exp->type = type;
+	exp->type = NULL;
 	exp->next = NULL;
+	return exp;
+}
+Exp* newExp3(char* value, const int token, Exp* type) {
+	Exp* exp = newExp(value, token);
+	exp->type = type;
+	return exp;
+}
+Exp* newExp4(char* value, const int token, Exp* type, Exp* next) {
+	Exp* exp = newExp(value, token);
+	exp->type = type;
+	exp->next = next;
 	return exp;
 }
 
 void freeExp(Exp* exp) {
 	if (exp != NULL) {
-		if (exp->token != EXP_POINTER || exp->token != EXP_FUNCTION || exp->token != EXP_VAR || exp->token != EXP_TYPE){
-			free(exp->value);
-			freeExp(exp->type);
-			freeExp(exp->next);
-			free(exp);
-		}
+		if(exp->value) free(exp->value);
+		freeExp(exp->type);
+		freeExp(exp->next);
+		free(exp);
 	}
+}
+
+void freeAllExp(int count, ...) {
+	va_list ap;
+	va_start(ap, count);
+		freeExp(va_arg(ap, Exp*));
+	va_end(ap);
 }

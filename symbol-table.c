@@ -52,7 +52,7 @@ void expandScopeControl() {
 void inScope() {
 	int i;
 	SymbolTable* table;
-	if(scopeControl->scope < scopeControl->size) 
+	if(scopeControl->scope < scopeControl->size)
 		scopeControl->scope++;
 	if(scopeControl->scope == scopeControl->size)
 		expandScopeControl();
@@ -102,16 +102,12 @@ int add(Exp* exp) {
 	} else {
 		last->next = newItem(exp);
 	}
-	/*if(exp->type == NULL)
-		printf("ADDED [%d] NULL %s in SCOPE %d\n", exp->token, exp->value, scopeControl->scope);
-	else
-		printf("ADDED [%d] %s %s in SCOPE %d\n", exp->token, exp->type->value, exp->value, scopeControl->scope); */
 	return 0;
 }
 
 Exp* get(const char* name) {
 	Item* item = scopeControl->tables[scopeControl->scope]->list[ getHash(name) ];
-	while (item != NULL && item->next != NULL  && strcmp(name, item->exp->value)) {
+	while (item != NULL && item->next != NULL && strcmp(name, item->exp->value)) {
 		item = item->next;
 	}
 	if (item == NULL)
@@ -123,7 +119,7 @@ Exp* getInScope(int scp, const char* name){
 	Item* item = NULL;
 	if(scp <= scopeControl->scope){
 		item = scopeControl->tables[scp]->list[ getHash(name) ];
-		while (item != NULL && item->next != NULL  && strcmp(name, item->exp->value)) {
+		while (item != NULL && item->next != NULL && strcmp(name, item->exp->value)) {
 			item = item->next;
 		}
 	}
@@ -138,7 +134,7 @@ Exp* getAll(const char* name){
 		Exp* exp = getInScope(upScope, name);
 		if(exp != NULL)
 			return exp;
-		upScope --;
+		upScope--;
 	}
 	return NULL;
 }
@@ -149,13 +145,13 @@ void initSymbolTable() {
 	scopeControl->size = 0;
 	scopeControl->scope = 0;
 	inScope();
-	add(newExp(strdup("short"), EXP_TYPE, NULL));
-	add(newExp(strdup("int"), EXP_TYPE, NULL));
-	add(newExp(strdup("long"), EXP_TYPE, NULL));
-	add(newExp(strdup("float"), EXP_TYPE, NULL));
-	add(newExp(strdup("double"), EXP_TYPE, NULL));
-	add(newExp(strdup("void"), EXP_TYPE, NULL));
-	add(newExp(strdup("char"), EXP_TYPE, NULL));
-	add(newExp(strdup("printf"), EXP_FUNCTION, NULL));
-	add(newExp(strdup("scanf"), EXP_FUNCTION, NULL));
+	add(newExp(strdup("short"), EXP_TYPE));
+	add(newExp(strdup("int"), EXP_TYPE));
+	add(newExp(strdup("long"), EXP_TYPE));
+	add(newExp(strdup("float"), EXP_TYPE));
+	add(newExp(strdup("double"), EXP_TYPE));
+	add(newExp(strdup("void"), EXP_TYPE));
+	add(newExp(strdup("char"), EXP_TYPE));
+	add(newExp4(strdup("printf"), EXP_FUNCTION, get("int"), newExp4(NULL, STRING_LITERAL, NULL, newExp(NULL, ELLIPSIS))));
+	add(newExp4(strdup("scanf"), EXP_FUNCTION, get("int"), newExp4(NULL, STRING_LITERAL, NULL, newExp(NULL, ELLIPSIS))));
 }

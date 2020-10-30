@@ -2,6 +2,8 @@
 	#include "comum.c"
 	#include "lex.yy.c"
 	#include "semantic.c"
+
+	char* code;
 %}
 
 %union {
@@ -85,7 +87,7 @@ assignment_op
 	;
 
 primary_exp
-	: IDENTIFIER 																							{ primary_exp1(&$$, $1); }
+	: IDENTIFIER
 	| '(' exp ')'																							{ primary_exp2(&$$, $1, $2, $3); }
 	| primary_exp '[' exp ']' 																{ primary_exp3(&$$, $1, $2, $3, $4); }
 	| primary_exp '(' ')'																			{ primary_exp4(&$$, $1, $2, $3); }
@@ -121,7 +123,7 @@ complex_exp
 	;
 
 assignment_exp
-	: primary_exp assignment_op complex_exp										{ assignment_exp(&$$, $1, $2, $3); }
+	: primary_exp assignment_op complex_exp										{ assignment_exp($1, $2, $3); }
 	| primary_exp assignment_op assignment_exp
 	;
 
@@ -132,7 +134,7 @@ exp
 
 exp_list
 	: exp
-	| exp_list ',' exp																				{ exp_list(&$$, $1, $2); }
+	| exp_list ',' exp																				{ exp_list($1, $3); }
 	;
 
 declaration
@@ -250,7 +252,7 @@ direct_declarator
 	| direct_declarator '[' ']'																				{ direct_declarator4(&$$, $1, $2, $3); }
 	| direct_declarator '(' { checkScope(); } parameter_type_list ')'	{ direct_declarator5(&$$, $1, $2, $4, $5); }
 	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')' 																			{ direct_declarator7(&$$, $1, $2, $3); }
+	| direct_declarator '(' ')' 																			{ direct_declarator7($1, $2, $3); }
 	;
 
 pointer
@@ -361,12 +363,12 @@ compound_stm
 
 declaration_list
 	: declaration
-	| declaration_list declaration															{ nextExp(&$$, $1, $2); }
+	| declaration_list declaration															{ concatExp(&$$, $1, $2); }
 	;
 
 stm_list
 	: stm
-	| stm_list stm																							{ nextExp(&$$, $1, $2); }
+	| stm_list stm																							{ concatExp(&$$, $1, $2); }
 	;
 
 for_exp
@@ -392,7 +394,7 @@ jump_stm
 	| CONTINUE ';'																{ concatExp(&$$, $1, $2); }
 	| BREAK ';'																		{ concatExp(&$$, $1, $2); }
 	| RETURN ';'																	{ concatExp(&$$, $1, $2); }
-	| RETURN exp ';'															{ concatExp(&$$, $1, newExp(" ", 0, NULL)); concatExp(&$$, $$, $2); concatExp(&$$, $$, $3); }
+	| RETURN exp ';'															{ concatExp(&$$, $1, newExp(" ", 0)); concatExp(&$$, $$, $2); concatExp(&$$, $$, $3); }
 	;
 
 external_declaration
@@ -406,22 +408,33 @@ function_def
 	;
 
 	translation_unit
-	: external_declaration													{ printf("%s", $1->value); }
+	: external_declaration													{ code = $1->value; }
 	| translation_unit external_declaration
 	;
 
 %%
 
 int main(int argc, char* argv[]) {
+	int result;
 	if (!argv[1]) {
 		printf("Enter the path of the cn file in the first parameter\n");
-		exit(1);
+		return 1;
 	}
 	yyin = fopen(argv[1], "r");
 	if (!yyin) {
 		printf("Could not use the file \"%s\"\n", argv[1]);
-		exit(1);
+		return 1;
 	}
 	initSymbolTable();
-	return yyparse();
+	result = yyparse();
+	fclose(yyin);
+	if (!result) {
+		if (argv[2])
+			yyout = fopen(argv[2], "w");
+		else
+			yyout = stdout;
+		fprintf(yyout, "#include <stdio.h>\n#include <stdlib.h>\n%s\n", code);
+		fclose(yyout);
+	}
+	return result;
 }
