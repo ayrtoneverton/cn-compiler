@@ -10,7 +10,7 @@ char* getLabel(){
 
 char* getIf(const char* exp, const char* stm){
 	char* pos = getLabel();
-	char* result = concat(7, "if(!(",exp,")) goto ",pos,";",stm,pos,":;");
+	char* result = concat(8, "if(!(",exp,")) goto ",pos,";",stm,pos,":;");
 	free(pos);
 	return result;
 }
@@ -39,10 +39,12 @@ char* getDoWhile(const char* exp, const char* stm){
 	return result;
 }
 
-char* getFor(const char* exp1, const char* exp2, const char* exp3, const char* stm){
+char* getFor(const char* exp1, char* exp2, const char* exp3, const char* stm){
 	char* pre = getLabel();
 	char* pos = getLabel();
-	char* result = concat(14, exp1, pre,":if(!(",exp2,")) goto ",pos,";",stm,exp3?exp3:"","; goto ",pre,";",pos,":;");
+	char* result;
+	exp2[strlen(exp2) - 1] = '\0';
+	result = concat(14, exp1, pre,":if(!(",exp2,")) goto ",pos,";",stm,exp3?exp3:"","; goto ",pre,";",pos,":;");
 	freeAll(2, pre, pos);
 	return result;
 }

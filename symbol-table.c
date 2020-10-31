@@ -1,5 +1,4 @@
 #include <limits.h>
-#include <string.h>
 
 typedef struct Item {
 	struct Exp* exp;
@@ -28,11 +27,10 @@ Item* newItem(Exp* exp) {
 
 void freeItem(Item* item) {
 	if (item != NULL) {
-		/*
+		item->exp->inTable = 0;
 		freeExp(item->exp);
 		freeItem(item->next);
 		free(item);
-		*/
 	}
 }
 
@@ -91,6 +89,7 @@ int getHash(const char* key) {
 int add(Exp* exp) {
 	int hash = getHash(exp->value);
 	Item* last = scopeControl->tables[scopeControl->scope]->list[ hash ];
+	exp->inTable = 1;
 
 	while (last != NULL && last->next != NULL && strcmp(exp->value, last->exp->value)) {
 		last = last->next;

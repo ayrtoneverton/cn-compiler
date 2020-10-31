@@ -1,0 +1,25 @@
+
+int main() {
+	double x = 0;
+	int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+
+	while (x >= 0) {
+		printf("Enter value: ");
+		scanf("%lf", &x);
+
+		if (x >= 0) {
+			if (x <= 25) {
+				++i1;
+			} else if (x <= 50) {
+				++i2;
+			} else if (x <= 75) {
+				++i3;
+			} else if (x <= 100) {
+				++i4;
+			}
+		}
+	}
+
+	printf("\n%d in [0, 25], %d in [26, 50], %d in [51, 75] and %d in [76, 100]\n", i1, i2, i3, i4);
+	return 0;
+}

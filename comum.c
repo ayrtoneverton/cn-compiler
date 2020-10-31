@@ -44,16 +44,16 @@ char* concat(int count, ...){
 	int null_pos = 0;
 	int len = 1;
 	va_start(ap, count);
-	for (i = 0; i < count; i++)
-		len += strlen(va_arg(ap, char*));
+		for (i = 0; i < count; i++)
+			len += strlen(va_arg(ap, char*));
 	va_end(ap);
 	merged = calloc(sizeof(char), len);
 	va_start(ap, count);
-	for (i = 0; i < count; i++) {
-		char* s = va_arg(ap, char*);
-		strcpy(merged + null_pos, s);
-		null_pos += strlen(s);
-	}
+		for (i = 0; i < count; i++) {
+			char* s = va_arg(ap, char*);
+			strcpy(merged + null_pos, s);
+			null_pos += strlen(s);
+		}
 	va_end(ap);
 	return merged;
 }
@@ -63,6 +63,7 @@ typedef struct Exp {
 	int token;
 	struct Exp* type;
 	struct Exp* next;
+	char inTable;
 } Exp;
 
 Exp* newExp(char* value, const int token) {
@@ -71,6 +72,7 @@ Exp* newExp(char* value, const int token) {
 	exp->token = token;
 	exp->type = NULL;
 	exp->next = NULL;
+	exp->inTable = 0;
 	return exp;
 }
 Exp* newExp3(char* value, const int token, Exp* type) {
@@ -86,7 +88,7 @@ Exp* newExp4(char* value, const int token, Exp* type, Exp* next) {
 }
 
 void freeExp(Exp* exp) {
-	if (exp != NULL) {
+	if (exp != NULL && !exp->inTable) {
 		if(exp->value) free(exp->value);
 		freeExp(exp->type);
 		freeExp(exp->next);
