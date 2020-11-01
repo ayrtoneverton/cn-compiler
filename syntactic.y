@@ -106,6 +106,10 @@ unary_exp
 	| DEC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2) }
 	| IDENTIFIER INC_OP																				{ unary_exp89(&$$, $1, $2) }
 	| IDENTIFIER DEC_OP																				{ unary_exp89(&$$, $1, $2) }
+	| '+' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2) }
+	| '-' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2) }
+	| '+' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2) }
+	| '-' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2) }
 	;
 
 binary_exp
@@ -119,7 +123,7 @@ complex_exp
 	| SIZEOF binary_exp
 	| SIZEOF '(' type_name ')'
 	| '(' type_name ')' binary_exp
-	| binary_exp '?' exp ':' exp
+	| binary_exp '?' exp ':' exp															{ complex_exp6(&$$, $1, $2, $3, $4, $5) }
 	;
 
 assignment_exp
@@ -409,7 +413,7 @@ function_def
 
 	translation_unit
 	: external_declaration													{ code = $1->value }
-	| translation_unit external_declaration
+	| translation_unit external_declaration					{ concatExp(&$$, $1, $2); code = $$->value }
 	;
 
 %%

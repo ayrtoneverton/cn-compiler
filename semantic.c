@@ -17,8 +17,8 @@ void concatExp(Exp** exp, Exp* exp1, Exp* exp2) {
 }
 
 void primary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
-	*exp = newExp3(concat(3, exp1->value, exp2->value, exp3->value), exp2->token, exp2->type);
-	exp2->type = NULL;
+	checkDef(exp2);
+	*exp = newExp3(concat(3, exp1->value, exp2->value, exp3->value), EXP_OTHER, exp2->type);
 	freeAllExp(3, exp1, exp2, exp3);
 }
 
@@ -35,6 +35,12 @@ void primary_exp3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 
 void primary_exp4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	checkDef(exp1);
+	if (exp1->token != EXP_FUNCTION) {
+		yyerror(concat(3, "error: '", exp1->value, "' is not a function"));
+	}
+	if (exp1->next) {
+		yyerror(concat(3, "error: the '", exp1->value, "' function requires parameters"));
+	}
 	*exp = newExp3(concat(3, exp1->value, exp2->value, exp3->value), EXP_OTHER, exp1->type);
 	freeAllExp(3, exp1, exp2, exp3);
 }
@@ -78,6 +84,14 @@ void unary_exp67(Exp** exp, Exp* exp1, Exp* exp2){
 }
 
 void unary_exp89(Exp** exp, Exp* exp1, Exp* exp2){
+	char* tmp = exp2->value;
+	exp2->value = concat(2, exp1->value, tmp);
+	*exp = exp2;
+	free(tmp);
+	freeExp(exp1);
+}
+
+void unary_exp10(Exp** exp, Exp* exp1, Exp* exp2){
 	checkDef(exp1);
 	*exp = newExp3(concat(2, exp1->value, exp2->value), EXP_OTHER, exp1->type);
 	freeExp(exp2);
@@ -86,7 +100,7 @@ void unary_exp89(Exp** exp, Exp* exp1, Exp* exp2){
 void binary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	checkDef(exp1);
 	checkDef(exp3);
-	*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), exp2->token);
+	*exp = newExp(concat(5, exp1->value, " ", exp2->value, " ", exp3->value), EXP_OTHER);
 	freeAllExp(3, exp1, exp2, exp3);
 }
 
@@ -94,6 +108,12 @@ void complex_exp2(Exp** exp, Exp* exp1, Exp* exp2){
 	checkDef(exp2);
 	*exp = newExp(concat(2, exp1->value, exp2->value), INTEGER_LITERAL);
 	freeAllExp(2, exp1, exp2);
+}
+
+void complex_exp6(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4, Exp* exp5){
+	checkDef(exp2);
+	*exp = newExp(concat(5, exp1->value, exp2->value, exp3->value, exp4->value, exp5->value), EXP_OTHER);
+	freeAllExp(2, exp1, exp2, exp3, exp4, exp5);
 }
 
 void assignment_exp(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
