@@ -148,7 +148,7 @@ declaration
 declaration_specifiers
 	: storage_class_specifier
 	| storage_class_specifier declaration_specifiers
-	| type_specifier																					{ declaration_specifiers3(&$$, $1) }
+	| type_specifier
 	| type_specifier declaration_specifiers
 	| type_qualifier
 	| type_qualifier declaration_specifiers
@@ -254,7 +254,7 @@ direct_declarator
 	| '(' declarator ')'
 	| direct_declarator '[' complex_exp ']'														{ direct_declarator3(&$$, $1, $2, $3, $4) }
 	| direct_declarator '[' ']'																				{ direct_declarator4(&$$, $1, $2, $3) }
-	| direct_declarator '(' { checkScope() } parameter_type_list ')'	{ direct_declarator5(&$$, $1, $2, $4, $5) }
+	| direct_declarator '(' parameter_type_list ')'										{ direct_declarator5($1, $2, $3, $4) }
 	| direct_declarator '(' identifier_list ')'
 	| direct_declarator '(' ')' 																			{ direct_declarator7($1, $2, $3) }
 	;
@@ -273,12 +273,12 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list
-	| parameter_list ',' ELLIPSIS
+	| parameter_list ',' ELLIPSIS																			{ parameter_list2($1, $2, $3) }
 	;
 
 parameter_list
-	: parameter_declaration																						{ parameter_list1(&$$, $1) }
-	| parameter_list ',' parameter_declaration												{ parameter_list2(&$$, $1, $2, $3) }
+	: parameter_declaration
+	| parameter_list ',' parameter_declaration												{ parameter_list2($1, $2, $3) }
 	;
 
 parameter_declaration

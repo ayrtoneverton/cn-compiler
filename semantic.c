@@ -84,17 +84,17 @@ void unary_exp67(Exp** exp, Exp* exp1, Exp* exp2){
 }
 
 void unary_exp89(Exp** exp, Exp* exp1, Exp* exp2){
+	checkDef(exp1);
+	*exp = newExp3(concat(2, exp1->value, exp2->value), EXP_OTHER, exp1->type);
+	freeExp(exp2);
+}
+
+void unary_exp10(Exp** exp, Exp* exp1, Exp* exp2){
 	char* tmp = exp2->value;
 	exp2->value = concat(2, exp1->value, tmp);
 	*exp = exp2;
 	free(tmp);
 	freeExp(exp1);
-}
-
-void unary_exp10(Exp** exp, Exp* exp1, Exp* exp2){
-	checkDef(exp1);
-	*exp = newExp3(concat(2, exp1->value, exp2->value), EXP_OTHER, exp1->type);
-	freeExp(exp2);
 }
 
 void binary_exp2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
@@ -156,11 +156,6 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	freeAllExp(3, exp1, exp2, exp3);
 }
 
-void declaration_specifiers3(Exp** exp, Exp* exp1){
-	*exp = newExp3(strdup(exp1->value), EXP_OTHER, getAll(exp1->value));
-	freeExp(exp1);
-}
-
 void init_declarator_list1(Exp** exp, Exp* exp1){
 	*exp = newExp(strdup(exp1->value), EXP_OTHER);
 	(*exp)->next = exp1;
@@ -218,51 +213,28 @@ void direct_declarator4(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	freeAllExp(3, exp1, exp2, exp3);
 }
 
-void direct_declarator5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4, Exp* exp5){
+void direct_declarator5(Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 	if (exp1->token == EXP_VAR){
-		*exp = newExp3(concat(4, exp1->value, exp2->value, exp4->value, exp5->value), EXP_FUNCTION, exp1->type);
-		(*exp)->next = exp4;
-		exp1->token = EXP_OTHER;
-		freeAllExp(3, exp1, exp2, exp5);
+		exp1->next = exp3;
+		exp1->token = EXP_FUNCTION;
+		freeAllExp(2, exp2, exp4);
 	}
 	else
-		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp4->value, exp5->value, "' is not a valid declaration"));
-}
-
-void checkScope(){
-	if(scopeControl->scope != 0)
-		yyerror("error: function definition is not allowed here");
-	inScope();
+		yyerror(concat(6, "error: '", exp1->value, "' is not a valid declaration"));
 }
 
 void direct_declarator7(Exp* exp1, Exp* exp2, Exp* exp3){
-	checkScope();
 	if (exp1->token == EXP_VAR){
 		exp1->value = concat(3, exp1->value, exp2->value, exp3->value);
 		exp1->token = EXP_FUNCTION;
 		freeAllExp(2, exp2, exp3);
 	}
 	else
-		yyerror(concat(6, "error: '", exp1->value, exp2->value, exp3->value, "' is not a valid declaration"));
+		yyerror(concat(6, "error: '", exp1->value, "' is not a valid declaration"));
 }
 
-void parameter_list1(Exp** exp, Exp* exp1){
-	if(exp1->type)
-		*exp = newExp(concat(3, exp1->type->value, " " , exp1->value), EXP_OTHER);
-	else
-		*exp = newExp(strdup(exp1->value), EXP_OTHER);
-	(*exp)->next = exp1;
-}
-
-void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
+void parameter_list2(Exp* exp1, Exp* exp2, Exp* exp3){
 	Exp* last = exp1;
-	char* tmp = exp1->value;
-	if(exp3->type)
-		exp1->value = concat(5, exp1->value, exp2->value, exp3->type->value, " ", exp3->value);
-	else
-		exp1->value = concat(3, exp1->value, exp2->value, exp3->value);
-	free(tmp);
-
 	while(last->next){
 		last = last->next;
 	}
@@ -271,39 +243,45 @@ void parameter_list2(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 }
 
 void paramater_declaration(Exp** exp, Exp* exp1, Exp* exp2){
+	if(exp1->type)
+		exp2->type = exp1->type;
+	else
+		exp2->type = getAll(exp1->value);
 	*exp = exp2;
-	if((*exp)->type)
-		(*exp)->type->type = exp1->type;
 }
 
 void function_def_declaration(Exp* exp1, Exp* exp2){
-	Exp* par;
-	par = exp2->next;
+	Exp* p = exp2->next;
 	if (exp2->token != EXP_FUNCTION)
 		yyerror(concat(5, "error: '", exp1->value, " ", exp2->value, "'is not a valid function declaration"));
-	if(par){
-		par = par->next;
-		while(par){
-			Exp* local_var = par->type;
-			local_var->token = par->token;
-			par->type = local_var->type;
-			add(local_var);
-			par = par->next;
-		}
+	if(scopeControl->scope != 0)
+		yyerror("error: functions can only be defined in the global scope");
+	exp2->type = getAll(exp1->value);
+	add(exp2);
+	inScope();
+	while (p) {
+		add(p);
+		p = p->next;
 	}
 }
 
 void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
-	Exp* function;
+	Exp* p = exp2->next;
+	char* value = NULL;
+	char* tmp;
 	outScope();
-	function = exp2->type;
-	function->type = exp1->type;
-	function->token = EXP_FUNCTION;
-	add(function);
-	*exp = newExp(concat(4, exp1->value, " ", exp2->value, exp4->value), EXP_OTHER);
-	exp1->type = NULL;
-	exp2->type = NULL;
-	freeAllExp(2, exp1, exp2);
+	printf("%s\n", p->value);
+	while (p) {
+		if (value) {
+			tmp = value;
+			value = concat(5, value, ",", p->type->value, " ", p->value);
+			free(tmp);
+		} else
+			value = concat(3, p->type->value, " ", p->value);
+		p = p->next;
+	}
+	*exp = newExp(concat(7, exp1->value, " ", exp2->value, "(", value, ")", exp4->value), EXP_OTHER);
+	freeAllExp(2, exp1, exp4);
 }
 
 void selection_stm1(Exp** exp, Exp* exp3, Exp* exp5){
