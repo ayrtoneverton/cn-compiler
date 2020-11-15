@@ -59,7 +59,7 @@ void primary_exp5(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 	while (p && e && p->token != ELLIPSIS) {
 		if (e != exp3)
 			params = concat(3, params, ",", e->value);
-		if (p->token != e->token)
+		if (p->token != e->token && p->type != e->type)
 			show(concat(3, "warning: there is cohesion in function parameter'", exp1->value, "'"));
 		e = e->next;
 		p = p->next;
@@ -119,7 +119,7 @@ void complex_exp6(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4, Exp* ex
 void assignment_exp(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 	checkDef(exp1);
 	checkDef(exp3);
-	if (exp1->type != exp3->type)
+	if (exp1->token != exp3->token && exp1->type != exp3->type)
 		show(concat(3, "warning: there is cohesion in the '", exp1->value, "' assignment"));
 	*exp = newExp(concat(3, exp1->value, exp2->value, exp3->value), EXP_OTHER);
 	freeAllExp(3, exp1, exp2, exp3);

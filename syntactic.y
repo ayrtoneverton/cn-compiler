@@ -317,13 +317,13 @@ direct_abstract_declarator
 
 initializer
 	: exp
-	| '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	| '{' initializer_list '}'																				{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' initializer_list ',' '}'																		{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4); }
 	;
 
 initializer_list
 	: initializer
-	| initializer_list ',' initializer
+	| initializer_list ',' initializer																{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
 	;
 
 stm

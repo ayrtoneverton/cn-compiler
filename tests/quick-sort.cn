@@ -19,7 +19,7 @@ void quickSort(int array[], int start, int end) {
 		}
 	} while (j > i);
 
-	if (start < j) quickSort(array, start, j);
+	if (start < j) quickSort(array, start*1, j);
 	if (i < end) quickSort(array, i, end);
 }
 
