@@ -1,0 +1,41 @@
+
+void quickSort(int array[], int start, int end) {
+	int pivot, aux, i, j, middle;
+	i = start;
+	j = end;
+	middle = ((i + j) / 2);
+	pivot = array[middle];
+
+	do {
+		while (array[i] < pivot) i = i + 1;
+		while (array[j] > pivot) j = j - 1;
+
+		if (i <= j) {
+			aux = array[i];
+			array[i] = array[j];
+			array[j] = aux;
+			i = i + 1;
+			j = j - 1;
+		}
+	} while (j > i);
+
+	if (start < j) quickSort(array, start, j);
+	if (i < end) quickSort(array, i, end);
+}
+
+int main() {
+    int arr[] = { 3, 4, 6, 2, 5, 6, 55, 7, 4, 1, 6, 5, 3, 15, 7, 8, 8, 6, 4, 3 };
+    int i;
+	for(i = 0; i < 20; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+
+    quickSort(arr, 0, 19);
+
+	for(i = 0; i < 20; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+    return 0;
+}

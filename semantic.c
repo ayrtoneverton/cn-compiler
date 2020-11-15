@@ -270,7 +270,7 @@ void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
 	char* value = NULL;
 	char* tmp;
 	outScope();
-	while (p) {
+	while (p && p->type) {
 		if (value) {
 			tmp = value;
 			value = concat(5, value, ",", p->type->value, " ", p->value);

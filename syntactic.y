@@ -388,7 +388,7 @@ selection_stm
 
 iteration_stm
 	: WHILE '(' exp ')' stm													{ iteration_stm1(&$$, $3, $5); }
-	| DO stm WHILE '(' exp ')' ';'
+	| DO stm WHILE '(' exp ')' ';'									{ iteration_stm2(&$$, $2, $5); }
 	| FOR '(' for_exp for_exp ')' stm								{ iteration_stm34(&$$, $3, $4, NULL, $6); }
 	| FOR '(' for_exp for_exp exp_list ')' stm			{ iteration_stm34(&$$, $3, $4, $5, $7); }
 	;
