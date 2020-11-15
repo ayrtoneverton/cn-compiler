@@ -1,12 +1,12 @@
 
 int main() {
-	double x, y;
+	float x, y;
 	int c = 2;
 	printf("Enter value X: ");
-	scanf("%lf", &x);
+	scanf("%f", &x);
 	printf("Enter value Y: ");
-	scanf("%lf", &y);
+	scanf("%f", &y);
 
-	printf("x * x - y + c = %lf", x * x - y + c);
+	printf("x * x - y + %d = %f\n", c, x * x - y + c);
 	return 0;
 }

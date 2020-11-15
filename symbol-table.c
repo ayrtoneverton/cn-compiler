@@ -104,40 +104,27 @@ int add(Exp* exp) {
 	return 0;
 }
 
-Exp* get(const char* name) {
-	Item* item = scopeControl->tables[scopeControl->scope]->list[ getHash(name) ];
-	while (item != NULL && item->next != NULL && strcmp(name, item->exp->value)) {
+Exp* getInScope(const char* name, const int scope) {
+	Item* item = scopeControl->tables[scope]->list[getHash(name)];
+	while (item && strcmp(name, item->exp->value)) {
 		item = item->next;
 	}
-	if (item == NULL)
-		return NULL;
-	return item->exp;
+	return item ? item->exp : NULL;
 }
 
-Exp* getInScope(int scp, const char* name){
-	Item* item = NULL;
-	if(scp <= scopeControl->scope){
-		item = scopeControl->tables[scp]->list[ getHash(name) ];
-		while (item != NULL && item->next != NULL && strcmp(name, item->exp->value)) {
-			item = item->next;
-		}
+Exp* get(const char* name) {
+	int scope = scopeControl->scope;
+	Exp* exp = NULL;
+	while (!exp && scope >= 0){
+		exp = getInScope(name, scope);
+		scope--;
 	}
-	if (item == NULL)
-		return NULL;
-	return item->exp;
+	return exp;
 }
 
-Exp* getAll(const char* name){
-	int upScope = scopeControl->scope;
-	while (upScope >= 0){
-		Exp* exp = getInScope(upScope, name);
-		if(exp != NULL)
-			return exp;
-		upScope--;
-	}
-	return NULL;
+Exp* getInThisScope(const char* name) {
+	return getInScope(name, scopeControl->scope);
 }
-
 
 void initSymbolTable() {
 	scopeControl = malloc(sizeof(ScopeControl));

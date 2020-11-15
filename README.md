@@ -12,5 +12,5 @@ $ rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.output *.dot
 ## Usando o analisador
 Após a compilação será gerado o executavel “compiler.exe”, para usa-lo é só executá-lo passando como primeiro parâmetro o nome do arquivo a ser analisado, o resultado da análise será impressa na saída padrão(console) com a formação de código reconhecido, caso a estrutura não seja reconhecida a impressão será encerrada e será exibido a linha e a coluna onde se encontra o erro. Exemplo de uso:
 ```SHELL
-$ ./cn tests.cn
+$ ./cn.exe tests.cn
 ```

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <mcheck.h>
 
 enum {
 	EXP_FUNCTION = -20,
@@ -88,8 +89,8 @@ Exp* newExp4(char* value, const int token, Exp* type, Exp* next) {
 }
 
 void freeExp(Exp* exp) {
-	if (exp != NULL && !exp->inTable) {
-		if(exp->value) free(exp->value);
+	if (exp && !mprobe(exp) && !exp->inTable) {
+		if(exp->value && mprobe(exp->value)) free(exp->value);
 		freeExp(exp->type);
 		freeExp(exp->next);
 		free(exp);

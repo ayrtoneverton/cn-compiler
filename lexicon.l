@@ -127,16 +127,16 @@ Exp* getType(const int token) {
 	Exp* exp = NULL;
 	switch (token) {
 		case CHAR_LITERAL:
-			exp = getAll("char");
+			exp = get("char");
 			break;
 		case INTEGER_LITERAL:
-			exp = getAll("int");
+			exp = get("int");
 			break;
 		case DECIMAL_LITERAL:
-			exp = getAll("float");
+			exp = get("float");
 			break;
 		case STRING_LITERAL:
-			exp = getAll("string");
+			exp = get("string");
 	}
 	return exp;
 }
@@ -152,7 +152,7 @@ int tokenUp(const int token) {
 	}
 	yylval.exp = NULL;
 	if(token == IDENTIFIER)
-		yylval.exp = getAll(yytext);
+		yylval.exp = get(yytext);
 	if(token > 0 && !yylval.exp)
 		yylval.exp = newExp3(strdup(yytext), token, getType(token));
 	return token;

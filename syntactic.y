@@ -88,10 +88,10 @@ assignment_op
 
 primary_exp
 	: IDENTIFIER
-	| '(' exp ')'																							{ primary_exp2(&$$, $1, $2, $3) }
-	| primary_exp '[' exp ']' 																{ primary_exp3(&$$, $1, $2, $3, $4) }
-	| primary_exp '(' ')'																			{ primary_exp4(&$$, $1, $2, $3) }
-	| primary_exp '(' exp_list ')'														{ primary_exp5(&$$, $1, $2, $3, $4) }
+	| '(' exp ')'																							{ primary_exp2(&$$, $1, $2, $3); }
+	| primary_exp '[' exp ']' 																{ primary_exp3(&$$, $1, $2, $3, $4); }
+	| primary_exp '(' ')'																			{ primary_exp4(&$$, $1, $2, $3); }
+	| primary_exp '(' exp_list ')'														{ primary_exp5(&$$, $1, $2, $3, $4); }
 	| primary_exp '.' IDENTIFIER
 	| primary_exp PTR_OP IDENTIFIER
 	;
@@ -102,32 +102,32 @@ unary_exp
 	| CHAR_LITERAL
 	| DECIMAL_LITERAL
 	| STRING_LITERAL
-	| INC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2) }
-	| DEC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2) }
-	| IDENTIFIER INC_OP																				{ unary_exp89(&$$, $1, $2) }
-	| IDENTIFIER DEC_OP																				{ unary_exp89(&$$, $1, $2) }
-	| '+' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2) }
-	| '-' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2) }
-	| '+' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2) }
-	| '-' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2) }
+	| INC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2); }
+	| DEC_OP IDENTIFIER																				{ unary_exp67(&$$, $1, $2); }
+	| IDENTIFIER INC_OP																				{ unary_exp89(&$$, $1, $2); }
+	| IDENTIFIER DEC_OP																				{ unary_exp89(&$$, $1, $2); }
+	| '+' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2); }
+	| '-' INTEGER_LITERAL																			{ unary_exp10(&$$, $1, $2); }
+	| '+' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2); }
+	| '-' DECIMAL_LITERAL																			{ unary_exp10(&$$, $1, $2); }
 	;
 
 binary_exp
 	: unary_exp
-	| binary_exp binary_op unary_exp													{ binary_exp2(&$$, $1, $2, $3) }
+	| binary_exp binary_op unary_exp													{ binary_exp2(&$$, $1, $2, $3); }
 	;
 
 complex_exp
 	: binary_exp
-	| unary_op binary_exp																			{ complex_exp2(&$$, $1, $2) }
+	| unary_op binary_exp																			{ complex_exp2(&$$, $1, $2); }
 	| SIZEOF binary_exp
 	| SIZEOF '(' type_name ')'
 	| '(' type_name ')' binary_exp
-	| binary_exp '?' exp ':' exp															{ complex_exp6(&$$, $1, $2, $3, $4, $5) }
+	| binary_exp '?' exp ':' exp															{ complex_exp6(&$$, $1, $2, $3, $4, $5); }
 	;
 
 assignment_exp
-	: primary_exp assignment_op complex_exp										{ assignment_exp(&$$, $1, $2, $3) }
+	: primary_exp assignment_op complex_exp										{ assignment_exp(&$$, $1, $2, $3); }
 	| primary_exp assignment_op assignment_exp
 	;
 
@@ -138,11 +138,11 @@ exp
 
 exp_list
 	: exp
-	| exp_list ',' exp																				{ exp_list($1, $3) }
+	| exp_list ',' exp																				{ exp_list($1, $3); }
 	;
 
 declaration
-	: declaration_specifiers init_declarator_list ';'					{ declaration(&$$, $1, $2, $3) }
+	: declaration_specifiers init_declarator_list ';'					{ declaration(&$$, $1, $2, $3); }
 	;
 
 declaration_specifiers
@@ -155,13 +155,13 @@ declaration_specifiers
 	;
 
 init_declarator_list
-	: init_declarator 																				{ init_declarator_list1(&$$, $1) }
-	| init_declarator_list ',' init_declarator 								{ init_declarator_list2($1, $2, $3) }
+	: init_declarator 																				{ init_declarator_list1(&$$, $1); }
+	| init_declarator_list ',' init_declarator 								{ init_declarator_list2($1, $2, $3); }
 	;
 
 init_declarator
 	: declarator
-	| declarator '=' initializer 															{ init_declarator(&$$, $1, $2, $3) }
+	| declarator '=' initializer 															{ init_declarator(&$$, $1, $2, $3); }
 	;
 
 storage_class_specifier
@@ -250,13 +250,13 @@ declarator
 	;
 
 direct_declarator
-	: IDENTIFIER																											{ direct_declarator1(&$$, $1) }
+	: IDENTIFIER																											{ direct_declarator1(&$$, $1); }
 	| '(' declarator ')'
-	| direct_declarator '[' complex_exp ']'														{ direct_declarator3(&$$, $1, $2, $3, $4) }
-	| direct_declarator '[' ']'																				{ direct_declarator4(&$$, $1, $2, $3) }
-	| direct_declarator '(' parameter_type_list ')'										{ direct_declarator5($1, $2, $3, $4) }
+	| direct_declarator '[' complex_exp ']'														{ direct_declarator3(&$$, $1, $2, $3, $4); }
+	| direct_declarator '[' ']'																				{ direct_declarator4(&$$, $1, $2, $3); }
+	| direct_declarator '(' parameter_type_list ')'										{ direct_declarator5($1, $2, $3, $4); }
 	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')' 																			{ direct_declarator7($1, $2, $3) }
+	| direct_declarator '(' ')' 																			{ direct_declarator7($1, $2, $3); }
 	;
 
 pointer
@@ -273,16 +273,16 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list
-	| parameter_list ',' ELLIPSIS																			{ parameter_list2($1, $2, $3) }
+	| parameter_list ',' ELLIPSIS																			{ parameter_list2($1, $2, $3); }
 	;
 
 parameter_list
 	: parameter_declaration
-	| parameter_list ',' parameter_declaration												{ parameter_list2($1, $2, $3) }
+	| parameter_list ',' parameter_declaration												{ parameter_list2($1, $2, $3); }
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator 															{ paramater_declaration(&$$, $1, $2) }
+	: declaration_specifiers declarator 															{ paramater_declaration(&$$, $1, $2); }
 	| declaration_specifiers abstract_declarator
 	| declaration_specifiers
 	;
@@ -329,7 +329,7 @@ initializer_list
 stm
 	: labeled_stm
 	| compound_stm
-	| exp ';'																													{ concatExp(&$$, $1, $2) }
+	| exp ';'																													{ concatExp(&$$, $1, $2); }
 	| selection_stm
 	| iteration_stm
 	| jump_stm
@@ -359,46 +359,46 @@ switch_stm
 	;
 
 compound_stm
-	: '{' '}'																										{ concatExp(&$$, $1, $2) }
-	| '{' stm_list '}'																					{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3) }
-	| '{' declaration_list '}'																	{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3) }
-	| '{' declaration_list stm_list '}'													{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4) }
+	: '{' '}'																										{ concatExp(&$$, $1, $2); }
+	| '{' stm_list '}'																					{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list '}'																	{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); }
+	| '{' declaration_list stm_list '}'													{ concatExp(&$$, $1, $2); concatExp(&$$, $$, $3); concatExp(&$$, $$, $4); }
 	;
 
 declaration_list
 	: declaration
-	| declaration_list declaration															{ concatExp(&$$, $1, $2) }
+	| declaration_list declaration															{ concatExp(&$$, $1, $2); }
 	;
 
 stm_list
 	: stm
-	| stm_list stm																							{ concatExp(&$$, $1, $2) }
+	| stm_list stm																							{ concatExp(&$$, $1, $2); }
 	;
 
 for_exp
 	: ';'
-	| exp_list ';'																							{ concatExp(&$$, $1, $2) }
+	| exp_list ';'																							{ concatExp(&$$, $1, $2); }
 	;
 
 selection_stm
-	: IF '(' exp ')' stm																				{ selection_stm1(&$$, $3, $5) }
-	| IF '(' exp ')' stm ELSE stm																{ selection_stm2(&$$, $3, $5, $7) }
+	: IF '(' exp ')' stm																				{ selection_stm1(&$$, $3, $5); }
+	| IF '(' exp ')' stm ELSE stm																{ selection_stm2(&$$, $3, $5, $7); }
 	| switch_stm
 	;
 
 iteration_stm
-	: WHILE '(' exp ')' stm													{ iteration_stm1(&$$, $3, $5) }
+	: WHILE '(' exp ')' stm													{ iteration_stm1(&$$, $3, $5); }
 	| DO stm WHILE '(' exp ')' ';'
-	| FOR '(' for_exp for_exp ')' stm								{ iteration_stm34(&$$, $3, $4, NULL, $6) }
-	| FOR '(' for_exp for_exp exp_list ')' stm			{ iteration_stm34(&$$, $3, $4, $5, $7) }
+	| FOR '(' for_exp for_exp ')' stm								{ iteration_stm34(&$$, $3, $4, NULL, $6); }
+	| FOR '(' for_exp for_exp exp_list ')' stm			{ iteration_stm34(&$$, $3, $4, $5, $7); }
 	;
 
 jump_stm
-	: GOTO IDENTIFIER ';'														{ concatExp(&$$, $1, $2) }
-	| CONTINUE ';'																	{ concatExp(&$$, $1, $2) }
-	| BREAK ';'																			{ concatExp(&$$, $1, $2) }
-	| RETURN ';'																		{ concatExp(&$$, $1, $2) }
-	| RETURN exp ';'																{ concatExp(&$$, $1, newExp(" ", 0)); concatExp(&$$, $$, $2); concatExp(&$$, $$, $3) }
+	: GOTO IDENTIFIER ';'														{ concatExp(&$$, $1, $2); }
+	| CONTINUE ';'																	{ concatExp(&$$, $1, $2); }
+	| BREAK ';'																			{ concatExp(&$$, $1, $2); }
+	| RETURN ';'																		{ concatExp(&$$, $1, $2); }
+	| RETURN exp ';'																{ concatExp(&$$, $1, newExp(" ", 0)); concatExp(&$$, $$, $2); concatExp(&$$, $$, $3); }
 	;
 
 external_declaration
@@ -407,13 +407,13 @@ external_declaration
 	;
 
 function_def
-	: declaration_specifiers declarator { function_def_declaration($1, $2) } compound_stm { function_def(&$$, $1, $2, $4) }
+	: declaration_specifiers declarator { function_def_declaration($1, $2); } compound_stm { function_def(&$$, $1, $2, $4); }
 	| declarator compound_stm
 	;
 
 	translation_unit
-	: external_declaration													{ code = $1->value }
-	| translation_unit external_declaration					{ concatExp(&$$, $1, $2); code = $$->value }
+	: external_declaration													{ code = $1->value; }
+	| translation_unit external_declaration					{ concatExp(&$$, $1, $2); code = $$->value; }
 	;
 
 %%
@@ -439,7 +439,7 @@ int main(int argc, char* argv[]) {
 			yyout = stdout;
 		fprintf(yyout, "#include <stdio.h>\n#include <stdlib.h>\n%s\n", code);
 		if (yyout != stdout)
-			printf("OK");
+			printf("OK\n");
 		fclose(yyout);
 	}
 	return result;

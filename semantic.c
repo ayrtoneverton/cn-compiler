@@ -2,12 +2,12 @@
 #include "converter.c"
 
 void checkDef(Exp* exp) {
-	if (exp->token == IDENTIFIER && exp->type == NULL)
+	if (exp->token == IDENTIFIER && !exp->type)
 		yyerror(concat(3, "error: '", exp->value, "' undeclared"));
 }
 
 void checkNotDef(Exp* exp){
-	if (get(exp->value))
+	if (getInThisScope(exp->value))
 		yyerror(concat(3, "error: '", exp->value, "' already declared"));
 }
 
@@ -29,7 +29,7 @@ void primary_exp3(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 	if(exp3->type && strcmp(exp3->type->value, "int"))
 		yyerror(concat(4, "error: index has no integer type '", exp3->type->value, "' = ", exp3->value));
 
-	*exp = newExp3(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), exp1->token, exp1->type);
+	*exp = newExp3(concat(4, exp1->value, exp2->value, exp3->value, exp4->value), EXP_OTHER, exp1->type);
 	freeAllExp(4, exp1, exp2, exp3, exp4);
 }
 
@@ -246,7 +246,7 @@ void paramater_declaration(Exp** exp, Exp* exp1, Exp* exp2){
 	if(exp1->type)
 		exp2->type = exp1->type;
 	else
-		exp2->type = getAll(exp1->value);
+		exp2->type = get(exp1->value);
 	*exp = exp2;
 }
 
@@ -256,7 +256,7 @@ void function_def_declaration(Exp* exp1, Exp* exp2){
 		yyerror(concat(5, "error: '", exp1->value, " ", exp2->value, "'is not a valid function declaration"));
 	if(scopeControl->scope != 0)
 		yyerror("error: functions can only be defined in the global scope");
-	exp2->type = getAll(exp1->value);
+	exp2->type = get(exp1->value);
 	add(exp2);
 	inScope();
 	while (p) {
@@ -270,7 +270,6 @@ void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
 	char* value = NULL;
 	char* tmp;
 	outScope();
-	printf("%s\n", p->value);
 	while (p) {
 		if (value) {
 			tmp = value;
@@ -280,7 +279,8 @@ void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
 			value = concat(3, p->type->value, " ", p->value);
 		p = p->next;
 	}
-	*exp = newExp(concat(7, exp1->value, " ", exp2->value, "(", value, ")", exp4->value), EXP_OTHER);
+	value = value ? concat(3, "(", value, ")") : "";
+	*exp = newExp(concat(5, exp1->value, " ", exp2->value, value, exp4->value), EXP_OTHER);
 	freeAllExp(2, exp1, exp4);
 }
 
