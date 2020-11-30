@@ -162,8 +162,7 @@ void show(char* s) {
 	fprintf(stderr, "%s, row: %d, column: %d\n", s, row, column);
 }
 
-int yyerror(char* s) {
+void yyerror(char* s) {
 	show(s);
-	abort();
-	return 1;
+	exit(1);
 }

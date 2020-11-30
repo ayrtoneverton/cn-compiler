@@ -28,6 +28,8 @@ Item* newItem(Exp* exp) {
 void freeItem(Item* item) {
 	if (item != NULL) {
 		item->exp->inTable = 0;
+		if (item->exp->inSubTable)
+			return;
 		freeExp(item->exp);
 		freeItem(item->next);
 		free(item);
@@ -89,7 +91,7 @@ int getHash(const char* key) {
 int add(Exp* exp) {
 	int hash = getHash(exp->value);
 	Item* last = scopeControl->tables[scopeControl->scope]->list[ hash ];
-	exp->inTable = 1;
+	Exp* next = exp->next;
 
 	while (last != NULL && last->next != NULL && strcmp(exp->value, last->exp->value)) {
 		last = last->next;
@@ -100,6 +102,11 @@ int add(Exp* exp) {
 		return 1;
 	} else {
 		last->next = newItem(exp);
+	}
+	exp->inTable = 1;
+	while (next) {
+		next->inSubTable = 1;
+		next = next->next;
 	}
 	return 0;
 }

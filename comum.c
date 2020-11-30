@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <mcheck.h>
 
 enum {
 	EXP_FUNCTION = -20,
@@ -65,6 +64,7 @@ typedef struct Exp {
 	struct Exp* type;
 	struct Exp* next;
 	char inTable;
+	char inSubTable;
 } Exp;
 
 Exp* newExp(char* value, const int token) {
@@ -74,6 +74,7 @@ Exp* newExp(char* value, const int token) {
 	exp->type = NULL;
 	exp->next = NULL;
 	exp->inTable = 0;
+	exp->inSubTable = 0;
 	return exp;
 }
 Exp* newExp3(char* value, const int token, Exp* type) {
@@ -89,8 +90,8 @@ Exp* newExp4(char* value, const int token, Exp* type, Exp* next) {
 }
 
 void freeExp(Exp* exp) {
-	if (exp && !mprobe(exp) && !exp->inTable) {
-		if(exp->value && mprobe(exp->value)) free(exp->value);
+	if (exp && !exp->inTable && !exp->inSubTable) {
+		free(exp->value);
 		freeExp(exp->type);
 		freeExp(exp->next);
 		free(exp);
