@@ -136,8 +136,7 @@ void declaration(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp3){
 
 	while(declarator){
 		identifier = declarator->type;
-		if(get(identifier->value))
-			yyerror(concat(3, "error: '", identifier->value, "' already declared"));
+		checkNotDef(identifier);
 
 		identifier->type = exp1->type;
 		identifier->token = declarator->token;
@@ -221,7 +220,6 @@ void direct_declarator5(Exp* exp1, Exp* exp2, Exp* exp3, Exp* exp4){
 
 void direct_declarator7(Exp* exp1, Exp* exp2, Exp* exp3){
 	if (exp1->token == EXP_VAR){
-		exp1->value = concat(3, exp1->value, exp2->value, exp3->value);
 		exp1->token = EXP_FUNCTION;
 		freeAllExp(2, exp2, exp3);
 	}
@@ -275,7 +273,7 @@ void function_def(Exp** exp, Exp* exp1, Exp* exp2, Exp* exp4){
 			value = concat(3, p->type->value, " ", p->value);
 		p = p->next;
 	}
-	value = value ? concat(3, "(", value, ")") : "";
+	value = concat(3, "(", value ? value : "", ")");
 	*exp = newExp(concat(5, exp1->value, " ", exp2->value, value, exp4->value), EXP_OTHER);
 	freeAllExp(2, exp1, exp4);
 }
