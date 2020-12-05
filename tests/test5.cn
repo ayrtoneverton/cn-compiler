@@ -1,0 +1,24 @@
+
+void mdc(int n, int m, int* r) {
+	if (m % n == 0) {
+		*r = n;
+	} else if (n % m == 0) {
+		*r = m;
+	} else {
+		mdc(n, m % n, r);
+	}
+}
+
+int main() {
+	int n = 0, m = 0, r = 0;
+
+	printf("Enter value N:");
+	scanf("%d", &n);
+	printf("Enter value M:");
+	scanf("%d", &m);
+
+	mdc(n, m, &r);
+
+	printf("mdc: %d\n", r);
+	return 0;
+}

@@ -1,5 +1,5 @@
 %{
-	#include "comum.c"
+	#include "commun.c"
 	#include "lex.yy.c"
 	#include "semantic.c"
 
@@ -245,7 +245,7 @@ type_qualifier
 	;
 
 declarator
-	: pointer direct_declarator
+	: pointer direct_declarator																				{ concatExp(&$$, $1, $2); }
 	| direct_declarator
 	;
 
@@ -411,7 +411,7 @@ function_def
 	| declarator compound_stm
 	;
 
-	translation_unit
+translation_unit
 	: external_declaration													{ code = $1->value; }
 	| translation_unit external_declaration					{ concatExp(&$$, $1, $2); code = $$->value; }
 	;
