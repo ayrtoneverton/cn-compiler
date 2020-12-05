@@ -1,19 +1,43 @@
 
 int main() {
-	int disp[2][3];
+	int matrix1[3][3];
+	int matrix2[3][3];
+	int result[3][3];
+	int i, j, x;
 
-	int i, j;
-	for(i = 0; i < 2; i++) {
+	for(i = 0; i < 3; i++) {
 		for(j = 0; j < 3; j++) {
-			printf("Enter value for disp[%d][%d]:", i, j);
-			scanf("%d", &disp[i][j]);
+			printf("Enter value for matrix1[%d][%d]:", i, j);
+			scanf("%d", &matrix1[i][j]);
+		}
+	}
+	for(i = 0; i < 3; i++) {
+		for(j = 0; j < 3; j++) {
+			printf("Enter value for matrix2[%d][%d]:", (i), j);
+			scanf("%d", &matrix2[i][j]);
 		}
 	}
 
-	printf("\n");
-	for(i = 0; i < 2; i++) {
+	printf("Sum:\n");
+	for(i = 0; i < 3; i++) {
 		for(j = 0; j < 3; j++) {
-			printf("%d ", disp[i][j]);
+			printf("%d ", matrix1[i][j] + matrix2[i][j]);
+		}
+		printf("\n");
+	}
+
+	for(i = 0; i < 3; i++) {
+		for(j = 0; j < 3; j++) {
+			result[i][j] = 0;
+			for(x = 0; x < 3; x++) {
+				result[i][j] +=  matrix1[i][x] * matrix2[x][j];
+			}
+		}
+	}
+	printf("Multiplication:\n");
+	for(i = 0; i < 3; i++) {
+		for(j = 0; j < 3; j++) {
+			printf("%d ", result[i][j]);
 		}
 		printf("\n");
 	}
